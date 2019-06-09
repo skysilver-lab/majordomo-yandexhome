@@ -1,0 +1,86 @@
+﻿<!--# Область со списком устройств (панели). #-->
+[#if RESULT#]
+   <!--# Если переданы сведения об устройствах, то выводим их в виде таблицы. #-->
+   [#if VIEW_STYLE="panels"#]
+   <div class="container-fluid">
+      <div class="row col-md-12 col-lg-12">
+   [#endif#]
+   [#begin RESULT#]
+   <!--# В цикле перебираем все записи из массива и формируем строки таблицы. #-->
+   [#if VIEW_STYLE="panels_group"#]
+      [#if NEW_ROOM#]
+      <div class="row">
+         <h4>[#ROOM#]</h4>
+      </div>
+      <div class="container-fluid">
+         <div class="row col-md-12 col-lg-12">
+      [#endif#]
+   [#endif#]
+         <div class="col-sm-6 col-md-6 col-lg-4">
+            <div class="panel panel-info">
+               <!--# Заголовок панели #-->
+               <div class="panel-heading">
+                  <div style="float:right;" class="dropdown">
+                     <a href="?view_mode=edit_yandexhome_devices&id=[#ID#]" class="btn btn-default btn-round" title="Настроить"><span class="glyphicon glyphicon-cog"></span></a>
+                     <a href="?view_mode=delete_yandexhome_devices&id=[#ID#]" class="btn btn-default btn-round" title="Удалить" onClick="return confirm('<#LANG_ARE_YOU_SURE#>')" style="color: #a94442;"><span class="glyphicon glyphicon-trash"></span></a>
+                  </div>
+                  <h3 class="panel-title"><b>[#TITLE#]</b></h3>
+               </div>
+               <!--# Содержимое панели #-->
+               <div class="panel-content">
+                  <img class="card-img pull-left" src="../templates/yandexhome/img/[#ICON#].svg" alt="Device Logo" onError="this.src='../img/modules/yandexhome.png'">
+                  <div class="caption">
+                     <div style="color:#999;font-size: 12px;">Описание</div>
+                     <div style="font-size:14px">
+                        <b>[#if DESCRIPTION!=""#][#DESCRIPTION#][#else#]&nbsp;[#endif#]</b>
+                     </div>
+                     <div style="color:#999;font-size: 12px;">Тип</div>
+                     <p>[#TYPE_TITLE#] ([#ICON#])</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+   [#if LAST_DEV==1 AND VIEW_STYLE="panels_group"#]
+      </div>
+   </div>
+   [#endif#]
+   [#end RESULT#]
+   [#if VIEW_STYLE="panels"#]
+      </div>
+   </div>
+   [#endif#]
+[#else RESULT#]
+   <!--# Если сведений об устройствах нет (устройства не добавлены), то выводим информационное сообщение. #-->
+   <div class="alert alert-warning" role="alert">Устройства еще не добавлены.</div>
+[#endif RESULT#]
+
+<style>
+.panel-heading {padding:3px}
+.panel-title {padding: 9px 12px 9px 12px;}
+.panel-info {
+   margin-bottom: 5px;
+}
+.btn-round {
+   border-radius:50px;
+   padding-left: 6px;
+   padding-right: 6px;
+   width: 34px;
+   height: 34px;
+}
+.dropdown-menu li a .glyphicon {
+   width:25px;
+}
+.dropdown-menu {
+   left: -80px; 
+}
+.card-img {
+   width:80px;
+   margin-right:10px;
+}
+.panel-content {padding: 5px 10px 0px 10px;}
+.col-sm-6, .col-md-4, .col-lg-4 {
+   padding-left:3px;
+   padding-right:3px;
+   max-width: 400px;
+}
+</style>

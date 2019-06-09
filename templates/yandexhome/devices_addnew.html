@@ -1,0 +1,64 @@
+﻿<!--# Интерфейс ручного добавления устройства. #-->
+<link rel="stylesheet" href="../templates/yandexhome/css/bootstrap-select.min.css">
+<legend>Новое устройство</legend>
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+   <fieldset>
+      [#if OK#]
+         <div class="alert alert-success" role="alert"><#LANG_DATA_SAVED#></div>
+      [#endif OK#]
+      [#if ERR#]
+         <div class="alert alert-danger" role="alert">Пожалуйста, заполните необходимые поля!</div>
+      [#endif ERR#]
+      <!--# Название устройства (обязательное поле). #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
+            <#LANG_TITLE#> (*):
+         </label>
+         <div class="col-lg-4"><input type="text" class="form-control" name="title" value="[#TITLE#]" id="title" [#if ERR_TITLE#] placeholder="Укажите название устройства!"[#endif#]></div>
+      </div>
+      <!--# Тип устройства (обязательное поле). #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label"><#LANG_TYPE#> (*):</label>
+         <div class="col-lg-4">
+            <select name="type" class="selectpicker show-tick form-control">
+            [#begin DEVICES_TYPE#]
+               <option data-content="<img src='../templates/yandexhome/img/[#device_name#].svg' width='20' height='20'>&nbsp;&nbsp;[#description#]" value="[#device_name#]"></option>
+            [#end DEVICES_TYPE#]
+            </select>
+         </div>
+      </div>
+      <!--# Местоположение устройства. #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label"><#LANG_LOCATION#>:</label>
+         <div class="col-lg-4">
+            <select name="location" class="form-control">
+               <option value=""></option>
+               [#begin LOCATIONS#]
+               <option value="[#TITLE#]">[#TITLE#]</option>
+               [#end LOCATIONS#]
+            </select>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="col-lg-offset-3 col-lg-4">
+            <button type="submit" name="subm" value="Add" class="btn btn-primary"><#LANG_ADD#></button>
+            <a href="?" class="btn btn-default"><#LANG_STRING_BACK#></a>
+            <input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
+            <input type="hidden" name="mode" value="addnew">
+         </div>
+      </div>
+   </fieldset>
+</form>
+
+<script type="text/javascript">
+
+var script = document.createElement('script');
+script.src = "../templates/yandexhome/css/bootstrap-select.min.js"
+document.body.appendChild(script);
+
+script.onload = function() {
+   // после подгрузки js-файла перерисуем элемент select
+   $('.selectpicker').selectpicker('render');
+}
+
+</script>

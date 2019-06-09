@@ -1,0 +1,141 @@
+﻿<!--# Область настроек. #-->
+<div class="collapse" id='api_settings'>
+   &nbsp;
+   <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+      <fieldset>
+         <div class="form-group">
+            <label class="control-label">Логин пользователя
+               <span class='support-hover' tabindex="1" data-title="Укажите имя пользователя, которое будет использовано при добавлении вашего навыка в приложение Yandex Home, а также при идентификации устройств на стороне Yandex.">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </label>
+            <div class="col-lg-4"><input class="form-control" type="text" autocomplete="username" name="user_name" value="[#if USER_NAME!=""#][#USER_NAME#][#endif#]" class="input"></div>
+         </div>
+         <div class="form-group">
+            <label class="control-label">Пароль пользователя
+               <span class='support-hover' tabindex="1" data-title="Укажите пароль пользователя, который потребуется указать при добавлении вашего навыка в приложение Yandex Home.">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </label>
+            <div class="col-lg-4"><input class="form-control" type="password" autocomplete="current-password" name="user_pass" value="[#if USER_PASS!=""#][#USER_PASS#][#endif#]" class="input"></div>
+         </div>
+         <div class="form-group">
+            <label class="control-label">OAuth2 ID навыка
+               <span class='support-hover' tabindex="1" data-title="Клиентский идентификатор (Client Identifier) навыка, по которому модуль идентифицирует запросы от Yandex. Указывается в настройках навыка при его создании в личном кабинете Яндекс Диалоги.">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </label>
+            <div class="col-lg-4">
+               <input class="form-control" type="text" name="client_id" id="client_id" value="[#if CLIENT_ID!=""#][#CLIENT_ID#][#endif#]" class="input">
+            </div>
+            <span class="btn btn-link" onclick="generateClientId();" title="Генерировать случайный"><i class="glyphicon glyphicon-refresh"></i></span>
+         </div>
+         <div class="form-group">
+            <label class="control-label">OAuth2 KEY навыка
+               <span class='support-hover' tabindex="1" data-title="Секретный ключ (Client Password) навыка, по которому модуль авторизует запросы от Yandex. Указывается в настройках навыка при его создании в личном кабинете Яндекс Диалоги.">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </label>
+            <div class="col-lg-4">
+               <input class="form-control" type="text" name="client_key" id="client_key" value="[#if CLIENT_KEY!=""#][#CLIENT_KEY#][#endif#]" class="input">
+            </div>
+            <span class="btn btn-link" onclick="generateClientKey();" title="Генерировать случайный"><i class="glyphicon glyphicon-refresh"></i></span>
+         </div>
+         <div class="form-group">
+            <label class="control-label">Представление
+               <span class='support-hover' tabindex="1" data-title="Стиль отображения списка устройств на главной странице модуля. Табличный вид - без группировки и с группировкой по местоположению. Панельный вид - без группировки и с группировкой по местоположению.">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </label>
+            <div class="col-lg-4">
+               <select name="view_style" class="form-control">
+                  <option value="table" [#if VIEW_STYLE="table"#] selected[#endif#]>Таблица</option>
+                  <option value="table_group" [#if VIEW_STYLE="table_group"#] selected[#endif#]>Таблица с группировкой</option>
+                  <option value="panels" [#if VIEW_STYLE="panels"#] selected[#endif#]>Панели</option>
+                  <option value="panels_group" [#if VIEW_STYLE="panels_group" OR VIEW_STYLE=""#] selected[#endif#]>Панели с группировкой</option>
+               </select>
+            </div>
+         </div>
+         <div class="form-group">
+            <div class="controls"><input type="checkbox" name="log_debmes" value="1"[#if LOG_DEBMES="1"#] checked[#endif#]> 
+               Отладка DebMes <span class="btn btn-link" data-toggle="modal" data-target="#module_info" title="Показать служебную информацию"><i class="glyphicon glyphicon-list-alt"></i></span>
+            </div>
+         </div>
+         <div class="form-group">
+            <div class="controls"><input type="checkbox" name="log_ping" value="1"[#if LOG_PING="1"#] checked[#endif#]> 
+               Включать в лог <b>ping</b>-запросы
+            </div>
+         </div>
+         <div class="form-actions">
+            <button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+            <input type="hidden" name="view_mode" value="update_settings">
+         </div>
+      </fieldset>
+   </form>
+</div>
+
+<!--# Служебная информация модуля. #-->
+<div class="modal fade" id="module_info" tabindex="-1" role="dialog" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only"></span></button>
+            <h4 class="modal-title">Служебная информация</h4>
+         </div>
+         <div class="modal-body" style="padding-bottom: 10px; padding-top: 5px;">
+            <table>
+            <tbody>
+               <tr><td>Логин пользователя:</td><td><code>[#USER_NAME#]</code></td></tr>
+               <tr><td>ID пользователя:</td><td><code>[#USER_ID#]</code></td></tr>
+               <tr><td>OAuth2 ID:</td><td><code>[#CLIENT_ID#]</code></td></tr>
+               <tr><td>OAuth2 KEY:</td><td><code>[#CLIENT_KEY#]</code></td></tr>
+               <tr><td>OAuth2 Access token:</td><td><code>[#ACCESS_TOKEN#]</code></td></tr>
+               <tr><td>OAuth2 Access token expires:</td><td><code>[#ACCESS_TOKEN_EXPIRES#]</code></td></tr>
+               <tr><td>OAuth2 Refresh token:</td><td><code>[#REFRESH_TOKEN#]</code></td></tr>
+               <tr><td>OAuth2 Refresh token expires:</td><td><code>[#REFRESH_TOKEN_EXPIRES#]</code></td></tr>
+               <tr><td>OAuth2 Authorization code:</td><td><code>[#AUTHORIZATION_CODE#]</code></td></tr>
+               <tr><td>OAuth2 Authorization code expires:</td><td><code>[#AUTHORIZATION_CODE_EXPIRES#]</code></td></tr>
+               <tr><td>OAuth2 Redirect URL:</td><td><code>[#REDIRECT_URI#]</code></td></tr>
+               <tr><td>Отладка DebMes:</td><td><code>[#LOG_DEBMES#]</code></td></tr>
+               <tr><td>Включать в лог ping:</td><td><code>[#LOG_PING#]</code></td></tr>
+               <tr><td>Представление:</td><td><code>[#VIEW_STYLE#]</code></td></tr>
+            </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script type="text/javascript">
+
+   function generateClientId() {
+
+      var url = '/ajax/yandexhome.html?op=generateClientId';
+
+      $('#client_id').val('');
+
+      $.ajax({
+         url: url,
+         cache: false,
+         success: function(html){
+            $('#client_id').val(html);
+         }
+      });
+   }
+
+   function generateClientKey() {
+
+      var url = '/ajax/yandexhome.html?op=generateClientKey';
+
+      $('#client_key').val('');
+
+      $.ajax({
+         url: url,
+         cache: false,
+         success: function(html){
+            $('#client_key').val(html);
+         }
+      });
+   }
+
+</script>

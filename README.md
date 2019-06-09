@@ -1,2 +1,3 @@
-# majordomo-yandexhome
-Yandex smart home platform integration
+# Yandex Home
+
+Модуль поддержки **личных** (приватных) навыков для платформы умного дома **Яндекс**.

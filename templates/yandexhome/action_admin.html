@@ -1,0 +1,76 @@
+<!--# Главная страница модуля в Панели управления. #-->
+[#if VIEW_MODE=""#]
+   <!--# Верхняя строка с кнопоками 'Настройки', 'Добавить', 'Синхронизировать', 'Справка', 'О модуле'. #-->
+   <div>
+      <!--# Логотип. #-->
+      <img src="../img/modules/yandexhome.png"  width="30" height="30">
+      &nbsp;&nbsp;&nbsp;
+      <!--# Кнопка 'Настройки'. #-->
+      <a class="btn btn-default" href="#api_settings" data-toggle="collapse"><i class="glyphicon glyphicon-cog"></i> Настройки</a>
+      &nbsp;&nbsp;&nbsp;
+      <!--# Кнопка 'Добавить'. #-->
+      <a href="?view_mode=addnew_yandexhome_devices" class="btn btn-default" title="Добавить устройство"><i class="glyphicon glyphicon-plus"></i></a>
+      &nbsp;&nbsp;&nbsp;
+      <!--# Ссылка на Яндекс Диалоги. #-->
+      <a href="https://dialogs.yandex.ru/developer/skills/" title="Перейти в Яндекс Диалоги" target="_blank">
+         <img src="../templates/yandexhome/img/dialog_logo.png"  width="30" height="30">
+      </a>
+      &nbsp;&nbsp;&nbsp;
+      <!--# Кнопка 'Синхронизировать'. #-->
+      <!--#<span class="btn btn-default disabled" onclick="SendSynqRequest();" title="Синхронизировать"><i class="glyphicon glyphicon-refresh"></i></span>#-->
+      <!--# Кнопка 'О модуле'. #-->
+      <div class="float-right">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      <button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#about">О модуле&nbsp;&nbsp;<span class="glyphicon glyphicon-info-sign icon-white"></span></button>
+      <!--# Кнопка 'Справка'. #-->
+      <div class="float-right">&nbsp;&nbsp;&nbsp;</div>
+      <!--#<a href="?view_mode=show_help" class="btn btn-default btn-sm float-right disabled" title="Справка"><i class="glyphicon glyphicon-question-sign"></i></a>#-->
+   </div>
+
+   <!--# Выпадающее меню настроек. #-->
+   [#inc settings.html#]
+
+   <!--# Область со списком устройств. #-->
+   [#if VIEW_STYLE="table" OR VIEW_STYLE="table_group"#]
+      [#inc devices_list_table.html#]
+   [#else#]
+      [#inc devices_list_panels.html#]
+   [#endif#]
+
+   <!--# Модальное окно со сведениями о модуле. #-->
+   [#inc about.html#]
+[#endif#]
+
+<!--# Интерфейс ручного добавления устройства. #-->
+[#if VIEW_MODE="addnew_yandexhome_devices"#]
+   [#inc devices_addnew.html#]
+[#endif#]
+
+<!--# Интерфейс редактирования настроек устройства и просмотра его данных. #-->
+[#if VIEW_MODE="edit_yandexhome_devices"#]
+   [#if ID!=""#]
+      <legend>[#TITLE#][#if ROOM!=""#] ([#ROOM#])[#endif#]</legend>
+      [#inc devices_edit.html#]
+   [#endif#]
+[#endif#]
+
+<!--# Справка по модулю. #-->
+[#if VIEW_MODE="show_help"#]
+   [#inc ./help/help_ru.html#] 
+[#endif#]
+
+<script type="text/javascript">
+
+   function SendSynqRequest() {
+
+      var url = '/ajax/yandexhome.html?op=SendSynqRequest';
+
+      $.ajax({
+         url: url,
+         cache: false,
+         success: function(html){
+            //console.log(html);
+         }
+      });
+   }
+
+</script>

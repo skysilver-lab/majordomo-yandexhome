@@ -1,0 +1,364 @@
+﻿<!--# Вкладка 'Общее'. #-->
+<link rel="stylesheet" href="../templates/yandexhome/css/bootstrap-select.min.css">
+
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+   <fieldset>
+      [#if OK#]
+         <div class="alert alert-success" role="alert"><#LANG_DATA_SAVED#></div>
+      [#endif OK#]
+      [#if ERR#]
+         <div class="alert alert-danger" role="alert"><#LANG_FILLOUT_REQURED#></div>
+      [#endif ERR#]
+      <!--# Название устройства (обязательное поле). #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
+            <#LANG_TITLE#> (*):
+         </label>
+         <div class="col-lg-4">
+            <input type="text" class="form-control" name="title" value="[#TITLE#]" id="title"[#if ERR_TITLE#] placeholder="Укажите название устройства!"[#endif#]>
+         </div>
+      </div>
+      <!--# Тип устройства (обязательное поле). #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label"><#LANG_TYPE#> (*):</label>
+         <div class="col-lg-4">
+            <select name="type" id="select_device" class="selectpicker show-tick form-control">
+            [#begin DEVICES_TYPE#]
+            <option data-content="<img src='../templates/yandexhome/img/[#device_name#].svg' width='20' height='20'>&nbsp;&nbsp;[#description#]" value="[#device_name#]" [#if device_name="<#TYPE#>"#] selected[#endif#]></option>
+            [#end DEVICES_TYPE#]
+            </select>
+         </div>
+      </div>
+      <!--# Местоположение устройства. #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label"><#LANG_LOCATION#>:</label>
+         <div class="col-lg-4">
+            <select name="location" class="form-control">
+               <option value=""></option>
+               [#begin LOCATIONS#]
+               <option value="[#TITLE#]" [#if TITLE="<#ROOM#>"#] selected[#endif#]>[#TITLE#]</option>
+               [#end LOCATIONS#]
+            </select>
+         </div>
+      </div>
+      <!--# Описание устройства. #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label">Описание устройства:</label>
+         <div class="col-lg-4">
+            <input type="text" class="form-control" name="description" value="[#DESCRIPTION#]" id="description">
+         </div>
+      </div>
+      <!--# Производитель устройства. #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label">Производитель устройства:</label>
+         <div class="col-lg-4">
+            <input type="text" class="form-control" name="manufacturer" value="[#MANUFACTURER#]" id="manufacturer">
+         </div>
+      </div>
+      <!--# Модель устройства. #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label">Модель устройства:</label>
+         <div class="col-lg-4">
+            <input type="text" class="form-control" name="model" value="[#MODEL#]" id="model">
+         </div>
+      </div>
+      <!--# Версия ПО устройства. #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label">Версия ПО:</label>
+         <div class="col-lg-4">
+            <input type="text" class="form-control" name="sw_version" value="[#SW_VERSION#]" id="sw_version">
+         </div>
+      </div>
+      <!--# Версия АО устройства. #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label">Версия АО:</label>
+         <div class="col-lg-4">
+            <input type="text" class="form-control" name="hw_version" value="[#HW_VERSION#]" id="hw_version">
+         </div>
+      </div>
+      <!--# Атрибуты устройства (обязательное поле). #-->
+      <div class="form-group">
+         <label class="col-lg-3 control-label"[#if ERR_TRAITS#] style="color:red;font-weight:bold"[#endif#]>
+            Характеристики (*):<br>(возможности, умения)
+         </label>
+         <div class="col-lg-4">
+            <div class="input-group">
+               <select id="select_trait" class="selectpicker form-control" title="Ничего не выбрано...">
+                  <option data-content="" value=""></option>
+                  [#begin DEVICES_INSTANCE#]
+                  <option data-content="[#description#] ([#instance_name#])" description="[#description#]" value="[#instance_name#]"></option>
+                  [#end DEVICES_INSTANCE#]
+               </select>
+               <span class="input-group-btn">
+                  <button class="btn btn-default" type="button" onclick="addTrait();"><i class="glyphicon glyphicon-plus"></i></button>
+               </span>
+            </div>
+         </div>
+      </div>
+      <div class="form-group">
+         <label class="col-lg-3 control-label"></label>
+         <div class="col-lg-4">
+            <table id="traits_table" class="table"></table>
+            <input type="hidden" class="form-control" name="traits_json" id="traits_json" value="{}">
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="col-lg-offset-3 col-lg-4">
+            <button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_SUBMIT#></button>
+            <a href="?" class="btn btn-default "><#LANG_STRING_BACK#></a>
+            <input type="hidden" name="id" value="<#ID#>">
+            <input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
+            <input type="hidden" name="mode" value="update">
+         </div>
+      </div>
+   </fieldset>
+</form>
+
+<div>
+   <pre id="objects_json" style="display:none;">[#OBJECTS#]</pre>
+</div>
+
+<script type="text/javascript">
+
+var script = document.createElement('script');
+script.src = 'templates/yandexhome/css/bootstrap-select.min.js';
+script.type = 'text/javascript';
+document.body.appendChild(script);
+
+//console.log('start');
+
+var traits_list = {};
+var objects_list = [];
+var objects_options = '';
+
+// Получаем список метрик в формате JSON.
+var traits_json = '[#TRAITS#]';
+
+// Получаем список метрик в формате JSON.
+var objects_json = $('#objects_json').text();
+
+script.onload = function() {
+   // После подгрузки js-файла перерисуем элементы select.
+   $('.selectpicker').selectpicker('render');
+
+   if (objects_json !== '') {
+      var objects = tryParseJSON(objects_json);
+      if (objects !== false) {
+         if (objects.length > 0) {
+            for (key in objects) {
+               if (objects[key].DESCRIPTION != '' && objects[key].DESCRIPTION != null) {
+                  let description = escapeHtml(objects[key].DESCRIPTION);
+                  objects_options += '<option style="white-space: normal;" data-subtext="'+description+'" value="'+objects[key].TITLE+'">'+objects[key].TITLE+'</option>';
+               } else {
+                  objects_options += '<option style="white-space: normal;" data-content="'+objects[key].TITLE+'" value="'+objects[key].TITLE+'"></option>';
+               }
+            }
+         }
+      }
+   } 
+
+   if (traits_json !== '') {
+      var traits = tryParseJSON(traits_json);
+      if (traits !== false) {
+         traits_list = traits;
+         for (key in traits_list) {
+            if (traits_list.hasOwnProperty(key)) {
+               // Делаем неактивными пункты в списке выбора метрик.
+               $('#select_trait').find('[value='+traits_list[key].type+']').prop('disabled', true);
+            }
+         }
+         // Обновляем список выбора метрик.
+         $('#select_trait').selectpicker('refresh');
+         // Формируем и выводим таблицу метрик.
+         renderTraitsTable();
+         saveTraitsList();
+      }
+   }
+
+   //console.log('stop');
+}
+
+function renderTraitsTable() {
+   $('#traits_table tr').remove();
+   for (key in traits_list) {
+      if (traits_list.hasOwnProperty(key)) {
+         let linked_type = traits_list[key].type;
+         let linked_object = traits_list[key].linked_object;
+         let linked_property = traits_list[key].linked_property;
+         let linked_description = traits_list[key].description;
+         // Формируем строки в таблице метрик.
+         addTraitRow(linked_type, linked_description, linked_object, linked_property);
+         objects_list[linked_object] = '';
+      }
+   }
+}
+
+function renderPropertySelectbox(id, object = '', selected = '') {
+   $('#' + id).selectpicker('refresh');
+   if (object !== '') {
+      if (objects_list[object] !== undefined && objects_list[object] !== '') {
+         $('#' + id).append(objects_list[object]);
+         $('#' + id).selectpicker('refresh');
+         if (selected !== '') {
+            $('#' + id).selectpicker('val', selected);
+         }
+      } else {
+         url = '<#ROOTHTML#>panel/linkedobject.html?ajax=1&op=properties';
+         url += '&object='+object;
+         $.get(url, function(props) {
+            if (props.PROPERTIES.length > 0) {
+               let optionsAsString = '<option data-content="" value=""></option>';
+               props = props.PROPERTIES;
+               for (key in props) {
+                  if (props[key].DESCRIPTION != '' && props[key].DESCRIPTION != null) {
+                     let description = escapeHtml(props[key].DESCRIPTION);
+                     optionsAsString += '<option style="white-space: normal;" data-subtext="'+description+'" value="'+props[key].TITLE+'">'+props[key].TITLE+'</option>';
+                  } else {
+                     optionsAsString += '<option style="white-space: normal;" data-content="'+props[key].TITLE+'" value="'+props[key].TITLE+'"></option>';
+                  }
+               }
+               $('#' + id).append(optionsAsString);
+               $('#' + id).selectpicker('refresh');
+               if (selected !== '') {
+                  $('#' + id).selectpicker('val', selected);
+               }
+               objects_list[object] = optionsAsString;
+            }
+         });
+      }
+   }
+}
+
+function renderObjectSelectbox(id, selected = '') {
+   $('#' + id).append(objects_options);
+   $('#' + id).selectpicker('refresh');
+   if (selected !== '') {
+      $('#' + id).selectpicker('val', selected);
+   }
+}
+
+function addTraitRow(linked_type, linked_description, linked_object, linked_property) {
+   // Строка с наименование метрики.
+   let row = $('<tr id="table_titlerow' + linked_type + '"/>');
+   $('#traits_table').append(row);
+   row.append($(`<td colspan="3">${linked_description} (${linked_type})</td>`));
+
+   // Строка с полями выбора объекта и свойства.
+   row = $('<tr id="table_mainrow' + linked_type + '"/>');
+   $('#traits_table').append(row);
+   row.append($(`<td><input type="hidden" class="form-control" name="trait_type" value="${linked_type}"></td>`));
+
+   // Привязанный объект. data-show-subtext="true"
+   row.append($(`<td><select id="linked_object${linked_type}" name="linked_object${linked_type}" class="selectpicker" title="Выберите объект" data-live-search="true" data-width="250px" style="max-width: 250px;" onChange="linkedObjectChaged('${linked_type}', this.value);"><option data-content="" value=""></option></select></td>`));
+
+   renderObjectSelectbox('linked_object' + linked_type, linked_object);
+
+   // Привязанное свойство.
+   row.append($(`<td><select id="linked_property${linked_type}" name="linked_property${linked_type}" class="selectpicker" title="Укажите свойство" data-width="250px" style="max-width: 250px;" onChange="linkedPropertyChaged('${linked_type}', this.value);"></select></td>`));
+
+   renderPropertySelectbox('linked_property' + linked_type, linked_object, linked_property);
+
+   // Кнопка удаления метрики.
+   row.append($(`<td><span id="${linked_type}" class="btn btn-link" onclick="deleteTrait($(this).attr(\'id\'));"><i class="glyphicon glyphicon-trash"></i></span></td>`));
+}
+
+function addTrait() {
+   // Считываем текущие значения из списка выбора метрик.
+   let trait_type = $('#select_trait').val();
+   let trait_description = $('#select_trait option:selected').attr('description');
+
+   if (trait_type != '') {
+      // Добавляем новый элемент в массив traits_list
+      traits_list[trait_type] = {};
+      traits_list[trait_type].type = trait_type;
+      traits_list[trait_type].description = trait_description;
+      traits_list[trait_type].linked_object = '';
+      traits_list[trait_type].linked_property = '';
+      saveTraitsList();
+
+      // Обновляем таблицу метрик.
+      addTraitRow(trait_type, trait_description, '', '');
+
+      // Сбрасываем значение список выбора метрик на дефолтное (пустое).
+      $('#select_trait').selectpicker('val', '');
+      // Делаем неактивными пункты в списке выбора метрик.
+      $('#select_trait').find('[value=' + trait_type + ']').prop('disabled', true);
+      // Обновляем список выбора метрик.
+      $('#select_trait').selectpicker('refresh');
+   }
+}
+
+function deleteTrait(trait_type) {
+   // Удаляем строки из таблицы метрик.
+   let rowTitle = document.getElementById('table_titlerow' + trait_type);
+   rowTitle.parentElement.removeChild(rowTitle);
+   let rowMain = document.getElementById('table_mainrow' + trait_type);
+   rowMain.parentElement.removeChild(rowMain);
+
+   // Удаляем элемент из массива traits_list
+   delete(traits_list[trait_type]);
+   saveTraitsList();
+
+   // Делаем активными пункт в списке выбора метрик.
+   $('#select_trait').find('[value=' + trait_type + ']').prop('disabled', false);
+   // Обновляем список выбора метрик.
+   $('#select_trait').selectpicker('refresh');
+}
+
+function saveTraitsList() {
+   $('#traits_json').val(JSON.stringify(traits_list));
+   //console.log(JSON.stringify(traits_list));
+}
+
+function linkedObjectChaged(id, selected_object) {
+   // Очищаем поле выбора привязанного свойства и подгружаем в него новые данные.
+   $('#linked_property' + id).empty();
+   $('#linked_property' + id).selectpicker('refresh');
+   renderPropertySelectbox('linked_property' + id, selected_object);
+
+   // Обновляем сведения о привязанном к метрике объекте.
+   traits_list[id].linked_object = selected_object;
+
+   // Свойство очищаем.
+   traits_list[id].linked_property = '';
+
+   saveTraitsList();
+}
+
+function linkedPropertyChaged(id, selected_property) {
+   // Обновляем сведения о привязанном к метрике свойстве объекте.
+   traits_list[id].linked_property = selected_property;
+   // Если свойство не выбрано, то объект очищаем.
+   if (selected_property === '') {
+      traits_list[id].linked_object = '';
+   }
+   saveTraitsList();
+}
+
+function tryParseJSON(jsonString){
+   try {
+      var o = JSON.parse(jsonString);
+      if (o && typeof o === 'object') return o;
+   }
+   catch (e) { }
+   return false;
+};
+
+function escapeHtml(string) {
+   var entityMap = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+      "/": "&#x2F;",
+      "`": "&#x60;",
+      "=": "&#x3D;"
+   };
+
+   return String(string).replace(/[&<>"'`=\/]/g, function(s) {
+      return entityMap[s];
+   });
+}
+
+</script>

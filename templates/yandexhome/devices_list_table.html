@@ -1,0 +1,60 @@
+﻿<!--# Область со списком устройств (таблица). #-->
+[#if RESULT#]
+   <!--# Если переданы сведения об устройствах, то выводим их в виде таблицы. #-->
+   <table align=center class="table table-hover table-condensed">
+   <thead><tr>
+      <th>&nbsp;</th>
+      <th>Название</th>
+      <th>Тип</th>
+      <th>Описание</th>
+      <th>Возможности</th>
+      [#if VIEW_STYLE="table"#]<th>Местоположение</th>[#endif#]
+      <th>&nbsp;</th>
+   </tr></thead>
+   <tbody>
+   [#begin RESULT#]
+   <!--# В цикле перебираем все записи из массива и формируем строки таблицы. #-->
+   [#if VIEW_STYLE="table_group"#]
+      [#if NEW_ROOM#]
+      <tr class="active"><td colspan="6"><div style="font-size:16px"><b>[#ROOM#]</b></div></td></tr>
+      [#endif#]
+   [#endif#]
+   <tr style="height:52px">
+      <td style="vertical-align:middle;width:60px" class="text-center">
+         <img src="../templates/yandexhome/img/[#ICON#].svg" height="40px" onError="this.src='../img/modules/yandexhome.png'">
+      </td>
+      <td style="vertical-align:middle">
+         <b>[#TITLE#]</b>
+      </td>
+      <td style="vertical-align:middle">
+         [#TYPE_TITLE#] ([#ICON#])
+      </td>
+      <td style="vertical-align:middle">
+         [#DESCRIPTION#]
+      </td>
+      <td style="vertical-align:middle">
+         [#TRAITS_LIST#]
+      </td>
+      [#if VIEW_STYLE="table"#]
+      <td style="vertical-align:middle">
+         [#if ROOM!=""#]
+            [#ROOM#]<br>
+         [#else#]
+            &nbsp;
+         [#endif#]
+      </td>
+      [#endif#]
+      <td style="vertical-align:middle" width="1%" nowrap>
+         <div style="width:130px">
+            <a href="?view_mode=edit_yandexhome_devices&id=[#ID#]" class="btn btn-default" title="Редактировать"><i class="glyphicon glyphicon-pencil"></i></a>
+            <a href="?view_mode=delete_yandexhome_devices&id=[#ID#]" onClick="return confirm('<#LANG_ARE_YOU_SURE#>')" class="btn btn-default" title="Удалить"><i class="glyphicon glyphicon-remove"></i></a>
+         </div>
+      </td>
+   </tr>
+   [#end RESULT#]
+   </tbody>
+   </table>
+[#else RESULT#]
+   <!--# Если сведений об устройствах нет (устройства не добавлены), то выводим информационное сообщение. #-->
+   <div class="alert alert-warning" role="alert">Устройства еще не добавлены.</div>
+[#endif RESULT#]
