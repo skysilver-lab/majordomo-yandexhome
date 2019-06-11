@@ -1,0 +1,176 @@
+<h4>Справка</h4>
+<div class="panel-group" id="accordion" style="width:98%">
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#general_help">Общие сведения</a>
+      </div>
+      <div class="panel-body collapse" id="general_help">
+         <div style="width:98%">
+            <p>Модуль <strong>Yandex Home</strong> предназначен для поддержки <strong>личных</strong> (приватных) навыков для платформы умного дома <strong>Яндекс</strong>. Модуль реализует <strong>авторизационный сервис</strong> на основе стандарта <strong>OAuth 2.0</strong> и <strong>Provider Adapter API</strong> - промежуточный API, который принимает на вход запросы в формате платформы умного дома Яндекс и преобразует их в запросы к API <strong>MajorDoMo</strong>.</p>
+            <p>Для успешного функционирования модуля и управления устройствами, подключенными к <strong>MajorDoMo</strong>, через ассистента <strong>Яндекс Алиса</strong> требуется, в первую очередь, <strong>опубликовать обработчики запросов</strong> (конечные точки, вебхуки) в сеть Интернет и обеспечить тем самым их доступность со стороны облака <strong>Яндекс</strong> по доменному имени (<strong>DNS</strong>) и протоколу <strong>HTTPS</strong>. Во вторую очередь, необходимо в консоли разработчика платформы Яндекс Диалогов создать, настроить и опубликовать <strong>приватный навык</strong> специальной категории <strong>Умный дом</strong>.</p>
+            <p>В модуле <strong>Yandex Home</strong> все обработчики запросов реализованы в виде отдельных файлов: <em>authorize.php</em>, <em>token.php</em> и <em>smarthome.php</em>, и размещаются в директории <em>/modules/yandexhome</em>.</p>
+            <div>
+            <table class="table table-hover" align="left" style="margin-bottom: 5px;">
+               <thead>
+                  <th>#</th>
+                  <th>Назначение вебхука</th>
+                  <th>URL вебхука</th>
+                  <th>Пример опубликованной ссылки</th>
+               </thead>
+               <tbody>
+                  <tr><td>1</td><td>URL авторизации</td><td>/modules/yandexhome/authorize.php</td><td><code>https://majordomo.keenetic.pro:8443/modules/yandexhome/authorize.php</code></td></tr>
+                  <tr><td>2</td><td>URL для получения и обновления токена</td><td>/modules/yandexhome/token.php</td><td><code>https://majordomo.keenetic.pro:8443/modules/yandexhome/token.php</code></td></tr>
+                  <tr><td>3</td><td>URL обработчика навыка</td><td>/modules/yandexhome/smarthome.php</td><td><code>https://majordomo.keenetic.pro:8443/modules/yandexhome/token.php</code></td></tr>
+               </tbody>
+            </table>
+            </div>
+            <p>В конечном итоге <strong>запуск модуля</strong> сводится к такой последовательности шагов:</p>
+            <ol>
+               <li>Установка модуля из маркета дополнений.</li>
+               <li>Настройка модуля.</li>
+               <li>Публикация обработчиков запросов.</li>
+               <li>Регистрация приватного навыка.</li>
+               <li>Объединение аккаунтов в приложении Яндекс.</li>
+               <li>Добавление и управление устройствами в модуле.</li>
+            </ol>
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#required_help">Требования</a>
+      </div>
+      <div class="panel-body collapse" id="required_help">
+         <div style="width:900px">
+            <div>
+            <ol>
+               <li><strong>Публичный</strong> (глобальный, белый) <strong>IP-адрес</strong>, выдаваемый интернет-провайдером.</li>
+               <li><strong>Доменное имя</strong> (DNS), привязанное к публичному IP-адресу.</li>
+               <li>Валидный <strong>SSL-сертификат</strong> на DNS-имя.</li>
+               <li><strong>Опубликованные</strong> в Интернет <strong>обработчики</strong> запросов.</li>
+               <li>Зарегистрированный и <strong>опубликованный</strong> приватный <strong>навык</strong> категории <strong><em>Умный дом</em></strong>.</li>
+               <li>Активное PHP-расширение <strong>pdo_mysql</strong>.</li>
+            </ol>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#settings_help">Настройка модуля</a>
+      </div>
+      <div class="panel-body collapse" id="settings_help">
+         <div style="width:900px">
+            <div>
+            <p>Настройка модуля заключается в генерации значений <strong>OAuth2 ID</strong> и <strong>OAuth2 KEY</strong> с помощью соответствующей кнопки, а также ввод произвольных <strong>логина</strong> и <strong>пароля</strong> пользователя, которые впоследствии будут запрошены в ходе объединения аккаунтов в <strong>приложении Яндекс</strong>.</p>
+            <p><img src="https://connect.smartliving.ru/cms/data_images/777_image.png" alt="Скриншот настроек модуля" class="img-responsive" /></p>
+            <p>На ранних этапах использования модуля <strong>рекомендуется включить</strong> ведение <strong>логов</strong> событий - <strong>Отладка DebMes</strong>.</p>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#webhooks_help">Публикация обработчиков запросов</a>
+      </div>
+      <div class="panel-body collapse" id="webhooks_help">
+         <div style="width:900px">
+            <div>
+            <p>Данный вопрос подробно рассмотрен в статье <strong><a href="https://connect.smartliving.ru/profile/461/blog/majordomo-i-yandeks-alisa-publikaciya-vebhukov.html">MajorDoMo и Яндекс Алиса. Публикация вебхуков.</a></strong></p>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#private_help">Регистрация приватного навыка</a>
+      </div>
+      <div class="panel-body collapse" id="private_help">
+         <div style="width:900px">
+            <div>
+            <p>Данный вопрос подробно рассмотрен в статье <strong><a href="https://connect.smartliving.ru/profile/461/blog/majordomo-i-yandeks-alisa-registraciya-privatnogo-navyka.html">MajorDoMo и Яндекс Алиса. Регистрация приватного навыка.</a></strong></p>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#accounts_help">Объединение аккаунтов в приложении Яндекс</a>
+      </div>
+      <div class="panel-body collapse" id="accounts_help">
+         <div style="width:900px">
+            <div>
+            <p>Данный вопрос подробно рассмотрен в статье <strong><a href="https://connect.smartliving.ru/profile/461/blog/majordomo-i-yandeks-alisa-obyedinenie-akkauntov.html">MajorDoMo и Яндекс Алиса. Объединение аккаунтов.</a></strong></p>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#dev_help">Добавление и управление устройствами в модуле</a>
+      </div>
+      <div class="panel-body collapse" id="dev_help">
+         <div style="width:900px">
+            <div>
+            <p>Модуль реализует классическую концепцию <strong>MajorDoMo</strong> для взаимодействия с пользователем через <strong>метрики</strong> и <strong>привязанные</strong> к ним <strong>свойства объекта</strong>. К метрикам (умениям) привязываются уже существующие объекты и свойства, через которые <strong>реализовано</strong> <strong>управление</strong> устройствами. К каждому умению устройства можно привязать свое свойство объекта.</p>
+            <p>Добавление нового устройства выполняется с помощью кнопки <strong>Добавить устройство</strong> на главной странице модуля. После чего указываются название, тип и местоположение устройства.</p>
+            <img src="https://connect.smartliving.ru/cms/data_images/778_image.png" alt="Скриншот кнопки добавления устройства" class="img-responsive" />
+            <p>Дальнейшее конфигурирование выполняется на странице редактирования (настройки) устройства.</p>
+            <p><img src="https://connect.smartliving.ru/cms/data_images/779_image.png" alt="Скриншот кнопки редактирования устройства" class="img-responsive" /></p>
+            <p><img src="https://connect.smartliving.ru/cms/data_images/780_image.png" alt="Скриншот кнопки редактирования устройства" class="img-responsive" /></p>
+            <p><strong>Обязательные</strong> для заполнения <strong>поля</strong> устройства:</p>
+            <ol>
+               <li>Название.</li>
+               <li>Тип.</li>
+               <li>Местоположение.</li>
+               <li>Умения.</li>
+            </ol>
+            <p>У каждого устройства <strong>должно быть</strong> указано <strong>минимум одно</strong> умение.</p>
+            <p><strong>Не обязательные</strong> для заполнения <strong>поля</strong> устройства:</p>
+            <ol>
+               <li>Описание.</li>
+               <li>Производитель.</li>
+               <li>Модель.</li>
+               <li>Версия программного обеспечения (ПО).</li>
+               <li>Версия аппаратного обеспечения (АО).</li>
+            </ol>
+            <p><img src="https://connect.smartliving.ru/cms/data_images/781_image.png" alt="Скриншот набора полей устройства" class="img-responsive" /></p>
+            <p><strong>Набор умений</strong> представлен в виде выпадающего списка.</p>
+            <p><img src="https://connect.smartliving.ru/cms/data_images/782_image.png" alt="Скриншот выпадающего списка умений" class="img-responsive" /></p>
+            <p><strong>Привязка</strong> <strong>свойства</strong> объекта к конкретному <strong>умению</strong> выполняется также с помощью выпадающих списков.</p>
+            <p><img src="https://connect.smartliving.ru/cms/data_images/783_image.png" alt="Скриншот привязки свойств" class="img-responsive" /></p>
+            <p>При добавлении устройств в модуле или изменении их свойств для обновления списка устройств в <strong>приложении</strong> <strong>Яндекс</strong> необходимо  каждый раз выполнять синхронизацию с помощью кнопки <strong>Обновить список устройств</strong> в окне свойств навыка. Удаляются устройства из <strong>приложения</strong> <strong>Яндекс</strong> вручную, либо через <strong>отвязывание аккаунта</strong> и последующее повторное объединение аккаунтов.</p>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <a data-toggle="collapse" data-parent="#accordion" href="#metrics_help">Метрики (умения)</a>
+      </div>
+      <div class="panel-body collapse" id="metrics_help">
+         <div style="width:900px">
+            <div>
+            <table class="table table-hover" align="left" style="margin-bottom: 5px;">
+               <thead>
+                  <th>Метрика (умение)</th>
+                  <th>Описание</th>
+                  <th style="width:180px">Значения в модуле</th>
+                  <th style="width:180px">Значения от Яндекс</th>
+               </thead>
+               <tbody>
+                  <tr><td><b>on</b></td><td>Включить/выключить (1 - включено, 0 выключено).</td><td>1 и 0</td><td>true и false</td></tr>
+                  <tr><td><b>brightness</b></td><td>Яркость (проценты).</td><td>1 - 100</td><td>1 - 100</td></tr>
+                  <tr><td><b>rgb</b></td><td>Цвет в формате RGB (hex).</td><td>000000 - FFFFFF</td><td>0 - 16777215</td></tr>
+                  <tr><td><b>temperature_k</b></td><td>Температура цвета (кельвины).</td><td>2700 - 9000</td><td>2700 - 9000</td></tr>
+               </tbody>
+            </table>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<br>
+<div>
+   <a href="?data_source=<#DATA_SOURCE#>" class="btn btn-default"><#LANG_STRING_BACK#></a>
+</div>
