@@ -19,6 +19,7 @@
       <tr class="active"><td colspan="6"><div style="font-size:16px"><b>[#ROOM#]</b></div></td></tr>
       [#endif#]
    [#endif#]
+   [#if TITLE#]
    <tr style="height:52px">
       <td style="vertical-align:middle;width:60px" class="text-center">
          <img src="../templates/yandexhome/img/[#ICON#].svg" height="40px" onError="this.src='../img/modules/yandexhome.png'">
@@ -51,6 +52,7 @@
          </div>
       </td>
    </tr>
+   [#endif#]
    [#end RESULT#]
    </tbody>
    </table>
