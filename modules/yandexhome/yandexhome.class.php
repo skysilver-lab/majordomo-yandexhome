@@ -3,7 +3,7 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2019 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 0.2b 2019/06/11
+* @version 0.4b 2019/06/20
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
@@ -251,13 +251,15 @@ class yandexhome extends module
                $loc_title = $res[$i]['ROOM'];
             }
             $res[$i]['LAST_DEV'] = 0;
-            if (isset($res[$i]['NEW_ROOM']) || $i == $total-1) {
+            if (isset($res[$i]['NEW_ROOM'])) {
                if ($i == $total-1) {
-                  $res[$i-1]['LAST_DEV'] = 1;
                   $res[$i]['LAST_DEV'] = 1;
-               } else if ($i > 0) {
+               }
+               if ($i > 0) {
                   $res[$i-1]['LAST_DEV'] = 1;
                }
+            } else if (!isset($res[$i]['NEW_ROOM']) && ($i == $total-1)) {
+               $res[$i]['LAST_DEV'] = 1;
             }
             $traits = json_decode($res[$i]['TRAITS'], true);
             if (is_array($traits) && count($traits) > 0) {
@@ -400,7 +402,7 @@ class yandexhome extends module
                if (is_array($new_dev_traits)) {
                   foreach ($new_dev_traits as $trait) {
                      $parameters = [];
-                     $trait_type = PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capabilitie'];
+                     $trait_type = PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'];
                      if (isset($this->devices_instance[$trait['type']]['parameters'])) {
                         $parameters = $this->devices_instance[$trait['type']]['parameters'];
                         if ($trait['type'] != 'rgb' && $trait['type'] != 'temperature_k') {
@@ -416,7 +418,7 @@ class yandexhome extends module
                            break;
                         }
                      }
-                     if ($check) {
+                     if ($check && $trait_type == PREFIX_CAPABILITIES.'color_setting') {
                         $traits[$check]['parameters'] = array_merge ($traits[$check]['parameters'], $parameters);
                      } else {
                         $traits[] = [
@@ -610,12 +612,18 @@ class yandexhome extends module
                      case 'temperature':
                         $state['value'] = (int)$value;
                         break;
+                     case 'volume':
+                        $state['value'] = (int)$value;
+                        break;
+                     case 'mute':
+                        $state['value'] = $value ? true : false;
+                        break;
                      default:
                         $state['value'] = $value;
                         break;
                   }
                   $capabilities[] = [
-                     'type' => PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capabilitie'],
+                     'type' => PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'],
                      'state' => $state
                   ];
                }
@@ -662,11 +670,11 @@ class yandexhome extends module
          $capabilities = [];
          $state = [];
 
-         foreach ($device['capabilities'] as $capabilitie) {
+         foreach ($device['capabilities'] as $capability) {
 
-            $type = str_replace(PREFIX_CAPABILITIES, '', $capabilitie['type']);
-            $value = $capabilitie['state']['value'];
-            $instance = $capabilitie['state']['instance'];
+            $type = str_replace(PREFIX_CAPABILITIES, '', $capability['type']);
+            $value = $capability['state']['value'];
+            $instance = $capability['state']['instance'];
 
             $this->WriteLog("Capabilities type '$type', instance '$instance', value=" . json_encode($value));
 
@@ -680,15 +688,19 @@ class yandexhome extends module
                if (is_array($traits) && isset($traits[$instance]) && $traits[$instance]['linked_object'] != '' && $traits[$instance]['linked_property'] != '') {
                   $linked_object = $traits[$instance]['linked_object'];
                   $linked_property = $traits[$instance]['linked_property'];
-                  switch ($instance) {
-                     case 'on':
+                  switch (true) {
+                     case ($instance == 'on' || $instance == 'mute') :
                         // Конвертируем true/false в 1/0.
                         $value = ($value === true) ? 1 : 0;
                         break;
-                     case 'brightness':
-                        // TODO
+                     case ($instance == 'volume' || $instance == 'channel') :
+                        if (isset($capability['state']['relative']) && $capability['state']['relative'] === true) {
+                           $cur_val = getGlobal("$linked_object.$linked_property");
+                           $value = $cur_val + $value;
+                           if ($value < 0) $value = 0;
+                        }
                         break;
-                     case 'rgb':
+                     case ($instance == 'rgb') :
                         $value = str_pad(dechex($value), 6, '0', STR_PAD_LEFT);
                         break;
                   }

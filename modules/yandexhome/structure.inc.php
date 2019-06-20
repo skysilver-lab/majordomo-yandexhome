@@ -71,18 +71,17 @@ $this->devices_instance = [
    'on' => [
       'instance_name' => 'on',
       'description' => 'Включить/выключить',
-      'capabilitie' => 'on_off',
+      'capability' => 'on_off',
       'default_value' => 0
-   ],/*
+   ],
    'volume' => [
       'instance_name' => 'volume',
       'description' => 'Громкость',
-      'capabilitie' => 'range',
-      'default_value' => 10,
+      'capability' => 'range',
+      'default_value' => 1,
       'parameters' => [
-         'unit' => 'unit.percent',
          'range' => [
-            'min' => 0,
+            'min' => 1,
             'max' => 100,
             'precision' => 1
          ]
@@ -90,18 +89,19 @@ $this->devices_instance = [
    ],
    'channel' => [
       'instance_name' => 'channel',
-      'description' => 'Канал',
-      'capabilitie' => 'range'
-   ],
+      'description' => 'ТВ-канал',
+      'capability' => 'range',
+      'default_value' => 1
+   ],/*
    'temperature' => [
       'instance_name' => 'temperature',
       'description' => 'Температура',
-      'capabilitie' => 'range'
+      'capability' => 'range'
    ],*/
    'temperature_k' => [
       'instance_name' => 'temperature_k',
       'description' => 'Цветовая температура',
-      'capabilitie' => 'color_setting',
+      'capability' => 'color_setting',
       'default_value' => 4500,
       'parameters' => [
          'temperature_k' => [
@@ -114,28 +114,29 @@ $this->devices_instance = [
    'thermostat' => [
       'instance_name' => 'thermostat',
       'description' => 'Режим работы',
-      'capabilitie' => 'mode'
-   ],
+      'capability' => 'mode'
+   ],*/
    'mute' => [
       'instance_name' => 'mute',
       'description' => 'Режим без звука',
-      'capabilitie' => 'toggle'
-   ],
+      'capability' => 'toggle',
+      'default_value' => false
+   ],/*
    'fan_speed' => [
       'instance_name' => 'fan_speed',
       'description' => 'Скорость вентиляции',
-      'capabilitie' => 'mode'
+      'capability' => 'mode'
    ],
    'hsv' => [
       'instance_name' => 'hsv',
       'description' => 'Цвет в формате HSV',
-      'capabilitie' => 'color_setting'
+      'capability' => 'color_setting'
    ],*/
    'rgb' => [
       'instance_name' => 'rgb',
       'description' => 'Цвет в формате RGB',
-      'capabilitie' => 'color_setting',
-      'default_value' => 16777215,
+      'capability' => 'color_setting',
+      'default_value' => '000000',
       'parameters' => [
          'color_model' => 'rgb'
       ]
@@ -143,7 +144,7 @@ $this->devices_instance = [
    'brightness' => [
       'instance_name' => 'brightness',
       'description' => 'Яркость',
-      'capabilitie' => 'range',
+      'capability' => 'range',
       'default_value' => 50,
       'parameters' => [
          'unit' => 'unit.percent',

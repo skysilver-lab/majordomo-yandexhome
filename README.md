@@ -29,9 +29,12 @@ ____
 | # | Метрика (умение) | Описание | Значения в модуле | Значения от Яндекс |
 | -------- | -------- | -------- | -------- | -------- | 
 | 1 | on | Включить/выключить (1 - включено, 0 выключено). | 1 и 0 | true и false |
-| 2 | brightness | Яркость (проценты). | 1 - 100 | 1 - 100 |
-| 3 | rgb | Цвет в формате RGB (hex). | 000000 - FFFFFF | 0 - 16777215 |
-| 4 | temperature_k | Температура цвета (кельвины). | 	2700 - 9000 | 2700 - 9000 |
+| 2 | volume | Громкость (проценты). | 1 - 100 | 1 - 100, либо +1/-1 |
+| 3 | channel | ТВ-канал. | № канала | № канала, либо +1/-1 |
+| 4 | temperature_k | Температура цвета (кельвины). | 2700 - 9000 | 2700 - 9000 |
+| 5 | mute | Режим без звука (1 - включено, 0 выключено). | 1 и 0 | true и false |
+| 6 | rgb | Цвет в формате RGB (hex). | 000000 - FFFFFF | 0 - 16777215 |
+| 7 | brightness | Яркость (проценты). | 1 - 100 | 1 - 100 |
 
 ____
 ### **Требования**
@@ -239,6 +242,9 @@ ____
 ### **Дополнительная информация и ссылки**
 * Обсуждение модуля на **[Форуме](https://mjdm.ru/forum/viewtopic.php?f=5&t=6498)**
 * Модуль в **[Connect](https://connect.smartliving.ru/tasks/482.html)**
+* [Алиса, включи свет на кухне.](https://connect.smartliving.ru/profile/461/blog/majordomo-i-yandeks-alisa-alisa-vklyuchi-svet-na-kuhne.html)
+* [Алиса, сделай ярче настольную лампу.](https://connect.smartliving.ru/profile/461/blog/majordomo-i-yandeks-alisa-alisa-uvelich-yarkost-nastolnoy-lampy.html)
+* [Алиса,  измени цвет бра на красный.](https://connect.smartliving.ru/profile/461/blog/majordomo-i-yandeks-alisa-alisa-izmeni-cvet-bra-na-krasnyy.html)
 
 ____
 #### [Поддержать разработку и развитие модуля](https://connect.smartliving.ru/tasks/482.html)
