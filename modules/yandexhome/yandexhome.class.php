@@ -3,7 +3,7 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2019 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 0.4b 2019/06/20
+* @version 0.5b 2019/07/01
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
@@ -337,6 +337,7 @@ class yandexhome extends module
 
       // Поддерживаемые метрики (возможности) устройств.
       $out['DEVICES_INSTANCE'] = array_values($this->devices_instance);
+      $out['DEVICES_INSTANCE_JSON'] = json_encode($this->devices_instance, JSON_UNESCAPED_UNICODE);
 
       // Список местоположений (комнат) в системе.
       $out['LOCATIONS'] = SQLSelect('SELECT ID, TITLE FROM locations ORDER BY TITLE');
@@ -387,12 +388,15 @@ class yandexhome extends module
          $old_dev_traits = json_decode($rec['TRAITS'], true);
          // Новые (в формате json).
          $rec['TRAITS'] = gr('traits_json');
-         // Новые (в формате json).
+         // Новые (массив).
          $new_dev_traits = json_decode($rec['TRAITS'], true);
          if ($rec['TRAITS'] == '' || count($new_dev_traits) == 0) {
             $out['ERR_TRAITS'] = 1;
             $ok = 0;
          }
+
+         // Конфигурация умений.
+         $devices_instance = json_decode(gr('instance_json'), true);
 
          // Если обязательные поля заполнены, то сохраняем конфигурацию устройства.
          if ($ok) {
@@ -403,8 +407,8 @@ class yandexhome extends module
                   foreach ($new_dev_traits as $trait) {
                      $parameters = [];
                      $trait_type = PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'];
-                     if (isset($this->devices_instance[$trait['type']]['parameters'])) {
-                        $parameters = $this->devices_instance[$trait['type']]['parameters'];
+                     if (isset($devices_instance[$trait['type']]['parameters'])) {
+                        $parameters = $devices_instance[$trait['type']]['parameters'];
                         if ($trait['type'] != 'rgb' && $trait['type'] != 'temperature_k') {
                            $parameters['instance'] = $trait['type'];
                         }
@@ -421,9 +425,15 @@ class yandexhome extends module
                      if ($check && $trait_type == PREFIX_CAPABILITIES.'color_setting') {
                         $traits[$check]['parameters'] = array_merge ($traits[$check]['parameters'], $parameters);
                      } else {
+                        if (isset($this->devices_instance[$trait['type']]['retrievable'])) {
+                           $retrievable = $this->devices_instance[$trait['type']]['retrievable'];
+                        } else {
+                           $retrievable = true;
+                        }
                         $traits[] = [
                            'type' => $trait_type,
-                           'parameters' => $parameters
+                           'parameters' => $parameters,
+                           'retrievable' => $retrievable
                         ];
                      }
                   }

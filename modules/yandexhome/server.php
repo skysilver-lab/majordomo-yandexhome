@@ -27,7 +27,7 @@ OAuth2\Autoloader::register();
 
 $storage = new OAuth2\Storage\MajordomoPdo(array('dsn' => $dsn, 'username' => DB_USER, 'password' => DB_PASSWORD));
 
-$server = new OAuth2\Server($storage, array('access_lifetime' => 12*3600));
+$server = new OAuth2\Server($storage, array('access_lifetime' => 7*24*3600));
 
 $server->addGrantType(new OAuth2\GrantType\ClientCredentials($storage));
 

@@ -91,13 +91,30 @@ $this->devices_instance = [
       'instance_name' => 'channel',
       'description' => 'ТВ-канал',
       'capability' => 'range',
-      'default_value' => 1
-   ],/*
+      'default_value' => 1,
+      'retrievable' => false,
+      'parameters' => [
+         'range' => [
+            'min' => 0,
+            'max' => 999,
+            'precision' => 1
+         ]
+      ]
+   ],
    'temperature' => [
       'instance_name' => 'temperature',
       'description' => 'Температура',
-      'capability' => 'range'
-   ],*/
+      'capability' => 'range',
+      'default_value' => 20,
+      'parameters' => [
+         'unit' => 'unit.temperature.celsius',
+         'range' => [
+            'min' => 1,
+            'max' => 100,
+            'precision' => 1
+         ]
+      ]
+   ],
    'temperature_k' => [
       'instance_name' => 'temperature_k',
       'description' => 'Цветовая температура',

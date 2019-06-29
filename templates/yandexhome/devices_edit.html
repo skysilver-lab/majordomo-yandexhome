@@ -99,7 +99,8 @@
          <label class="col-lg-3 control-label"></label>
          <div class="col-lg-4">
             <table id="traits_table" class="table"></table>
-            <input type="hidden" class="form-control" name="traits_json" id="traits_json" value="{}">
+            <input type="hidden" name="traits_json" id="traits_json" value="{}">
+            <input type="hidden" name="instance_json" id="instance_json" value="{}">
          </div>
       </div>
       <div class="form-group">
@@ -117,7 +118,14 @@
 <div>
    <pre id="objects_json" style="display:none;">[#OBJECTS#]</pre>
    <!--# <pre>[#CONFIG#]</pre> #-->
+   <!--# <pre>[#TRAITS#]</pre> #-->
 </div>
+
+<style>
+.popover {
+   max-width: 250px;
+}
+</style>
 
 <script type="text/javascript">
 
@@ -131,12 +139,22 @@ document.body.appendChild(script);
 var traits_list = {};
 var objects_list = [];
 var objects_options = '';
+var instance_list = {};
+
+var isPopover = false;
 
 // Получаем список метрик в формате JSON.
 var traits_json = '[#TRAITS#]';
 
 // Получаем список метрик в формате JSON.
 var objects_json = $('#objects_json').text();
+
+// Получаем массив поддерживаемых умений.
+var instance_list = tryParseJSON('[#DEVICES_INSTANCE_JSON#]');
+saveInstanceList();
+
+// Получаем конфиг устройства в формате JSON.
+var dev_config = tryParseJSON('[#CONFIG#]');
 
 script.onload = function() {
    // После подгрузки js-файла перерисуем элементы select.
@@ -176,11 +194,41 @@ script.onload = function() {
       }
    }
 
+   if (dev_config !== '' && dev_config !== false) {
+      let capabilities = dev_config.capabilities;
+      if (capabilities.length > 0) {
+         for (key in capabilities) {
+            if (typeof(capabilities[key].parameters.instance) != 'undefined' && capabilities[key].parameters.instance !== null) {
+               let linked_type = capabilities[key].parameters.instance;
+               if (instance_list[linked_type].capability === 'range') {
+                  if (typeof(capabilities[key].parameters.range) != 'undefined' && capabilities[key].parameters.range !== null) {
+                     min_value = capabilities[key].parameters.range['min'];
+                     max_value = capabilities[key].parameters.range['max'];
+                     precision_value = capabilities[key].parameters.range['precision'];
+                     instance_list[linked_type].parameters.range['min'] = min_value;
+                     instance_list[linked_type].parameters.range['max'] = max_value;
+                     instance_list[linked_type].parameters.range['precision'] = precision_value;
+                  }
+               }
+            }
+         }
+         saveInstanceList();
+      }
+   }
+
+   $('body').popover({
+      selector: '.popover_instance',
+      container: 'body',
+      placement: 'top',
+      html: true 
+   });
+
    //console.log('stop');
 }
 
 function renderTraitsTable() {
    $('#traits_table tr').remove();
+   isPopover = false;
    for (key in traits_list) {
       if (traits_list.hasOwnProperty(key)) {
          let linked_type = traits_list[key].type;
@@ -191,6 +239,9 @@ function renderTraitsTable() {
          addTraitRow(linked_type, linked_description, linked_object, linked_property);
          objects_list[linked_object] = '';
       }
+   }
+   if (isPopover) {
+      initPopovers();
    }
 }
 
@@ -242,7 +293,18 @@ function addTraitRow(linked_type, linked_description, linked_object, linked_prop
    // Строка с наименование метрики.
    let row = $('<tr id="table_titlerow' + linked_type + '"/>');
    $('#traits_table').append(row);
-   row.append($(`<td colspan="3">${linked_description} (${linked_type})</td>`));
+
+   let range_options = '';
+
+   if (instance_list[linked_type].capability === 'range') {
+      if (typeof(instance_list[linked_type].parameters) != 'undefined' && instance_list[linked_type].parameters !== null) {
+         range_options = 
+         `<span id="options${linked_type}" data-instance="${linked_type}" class="btn btn-link popover_instance" style="max-width: 250px;" data-toggle="popover" title="Дополнительные опции" data-content=''><i class="glyphicon glyphicon-cog"></i></span>`;
+         isPopover = true;
+      }
+   }
+
+   row.append($(`<td colspan="3">${linked_description} (${linked_type}) ${range_options}</td>`));
 
    // Строка с полями выбора объекта и свойства.
    row = $('<tr id="table_mainrow' + linked_type + '"/>');
@@ -277,8 +339,14 @@ function addTrait() {
       traits_list[trait_type].linked_property = '';
       saveTraitsList();
 
+      isPopover = false;
+
       // Обновляем таблицу метрик.
       addTraitRow(trait_type, trait_description, '', '');
+
+      if (isPopover) {
+         initPopovers();
+      }
 
       // Сбрасываем значение список выбора метрик на дефолтное (пустое).
       $('#select_trait').selectpicker('val', '');
@@ -308,7 +376,88 @@ function deleteTrait(trait_type) {
 
 function saveTraitsList() {
    $('#traits_json').val(JSON.stringify(traits_list));
-   //console.log(JSON.stringify(traits_list));
+}
+
+function getInstanceOptions(linked_type, init) {
+
+   let min_value = '';
+   let max_value = '';
+   let precision_value = '';
+
+   if (instance_list[linked_type].capability === 'range') {
+      if (typeof(instance_list[linked_type].parameters) != 'undefined' && instance_list[linked_type].parameters !== null) {
+         min_value = instance_list[linked_type].parameters.range['min'];
+         max_value = instance_list[linked_type].parameters.range['max'];
+         precision_value = instance_list[linked_type].parameters.range['precision'];
+      }
+   }
+
+   let optionsAsString = `
+      <div class="input-group input-group-sm">
+         <span class="input-group-addon" id="basic-addon1">Min&nbsp&nbsp</span>
+         <input type="text" class="form-control" aria-describedby="basic-addon1" id="min_value${linked_type}" value="${min_value}">
+      </div>
+      <div style="line-height: 50%;">&nbsp</div>
+      <div class="input-group input-group-sm">
+         <span class="input-group-addon" id="basic-addon2">Max&nbsp</span>
+         <input type="text" class="form-control" aria-describedby="basic-addon2" id="max_value${linked_type}" value="${max_value}">
+      </div>
+      <div style="line-height: 50%;">&nbsp</div>
+      <div class="input-group input-group-sm">
+         <span class="input-group-addon" id="basic-addon3">Step</span>
+         <input type="text" class="form-control" aria-describedby="basic-addon3" id="precision_value${linked_type}" value="${precision_value}">
+      </div>
+      <div style="line-height: 50%;">&nbsp</div>
+      <div class="text-center"> 
+         <span id="${linked_type}" class="btn btn-success btn-sm" onclick="saveInstanceOptions(this);"><i class="glyphicon glyphicon-ok"></i></span>&nbsp
+         <span id="${linked_type}" class="btn btn-default btn-sm" onclick="closePopover(this);"><i class="glyphicon glyphicon-remove"></i></span>
+      </div>`;
+
+   return optionsAsString;
+}
+
+function saveInstanceOptions(o) {
+   linked_type = o.id;
+
+   let min_value = Number($('#min_value' + linked_type).val());
+   let max_value = Number($('#max_value' + linked_type).val());
+   let precision_value = Number($('#precision_value' + linked_type).val());
+
+   instance_list[linked_type].parameters.range['min'] = min_value;
+   instance_list[linked_type].parameters.range['max'] = max_value;
+   instance_list[linked_type].parameters.range['precision'] = precision_value;
+
+   saveInstanceList();
+
+   $('#options' + linked_type).popover('toggle');
+}
+
+function saveInstanceList() {
+   $('#instance_json').val(JSON.stringify(instance_list));
+}
+
+function initPopovers() {
+   let $popovers = $('[data-toggle="popover"]');
+
+   $popovers.popover('destroy');
+
+   $popovers.popover({
+      selector: '.popover_instance',
+      container: 'body',
+      placement: 'top',
+      html: true 
+   });
+
+   $popovers.on('show.bs.popover', function () {
+      let linked_type = $(this).attr('data-instance');
+      let content = getInstanceOptions(linked_type);
+      $('#options' + linked_type).attr('data-content', content);
+   });
+}
+
+function closePopover(o) {
+   linked_type = o.id;
+   $('#options' + linked_type).popover('toggle');
 }
 
 function linkedObjectChaged(id, selected_object) {
