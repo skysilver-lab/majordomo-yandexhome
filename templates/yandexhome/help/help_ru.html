@@ -149,14 +149,14 @@
          <a data-toggle="collapse" data-parent="#accordion" href="#metrics_help">Метрики (умения)</a>
       </div>
       <div class="panel-body collapse" id="metrics_help">
-         <div style="width:900px">
+         <div style="width:950px">
             <div>
             <table class="table table-hover" align="left" style="margin-bottom: 5px;">
                <thead>
                   <th>Метрика (умение)</th>
                   <th>Описание</th>
-                  <th style="width:180px">Значения в модуле</th>
-                  <th style="width:180px">Значения от Яндекс</th>
+                  <th style="width:190px">Значения в модуле</th>
+                  <th style="width:190px">Значения от Яндекс</th>
                </thead>
                <tbody>
                   <tr><td><b>on</b></td><td>Включить/выключить (1 - включено, 0 выключено).</td><td>1 и 0</td><td>true и false</td></tr>
@@ -164,13 +164,37 @@
                   <tr><td><b>channel</b></td><td>ТВ-канал.</td><td>№ канала (*)</td><td>№ канала, либо +1/-1</td></tr>
                   <tr><td><b>temperature</b></td><td>Температура (градусы цельсия).</td><td>1 - 100 (*)</td><td>°C</td></tr>
                   <tr><td><b>temperature_k</b></td><td>Температура цвета (кельвины).</td><td>2700 - 9000</td><td>2700 - 9000</td></tr>
+                  <tr><td><b>thermostat</b></td><td>Температурный режим.</td><td>auto, heat, cool,<br>eco, dry, fan_only</td><td>auto, heat, cool,<br>eco, dry, fan_only</td></tr>
                   <tr><td><b>mute</b></td><td>Режим без звука (1 - включено, 0 выключено).</td><td>1 и 0</td><td>true и false</td></tr>
+                  <tr><td><b>fan_speed</b></td><td>Скорость вентиляции.</td><td>auto, low, medium, high</td><td>auto, low, medium, high</td></tr>
                   <tr><td><b>rgb</b></td><td>Цвет в формате RGB (hex).</td><td>000000 - FFFFFF</td><td>0 - 16777215</td></tr>
                   <tr><td><b>brightness</b></td><td>Яркость (проценты).</td><td>1 - 100 (*)</td><td>1 - 100</td></tr>
                </tbody>
             </table>
             </div>
             <div>* Имеется возможность переопределить диапазон значений и шаг изменения.</div>
+            <div>
+               <br>
+               <p><strong>Температурные режимы:</strong></p>
+               <ul>
+                  <li><b><i>auto</b></i> - авто;</li>
+                  <li><b><i>heat</b></i> - нагрев;</li>
+                  <li><b><i>cool</b></i> - охлаждение;</li>
+                  <li><b><i>eco</b></i> - экономичный;</li>
+                  <li><b><i>dry</b></i> - осушение;</li>
+                  <li><b><i>fan_only</b></i> - вентиляция.</li>
+               </ul>
+            </div>
+            <div>
+               <br>
+               <p><strong>Скорость вентиляции:</strong></p>
+               <ul>
+                  <li><b><i>auto</b></i> - авто;</li>
+                  <li><b><i>low</b></i> - низкая;</li>
+                  <li><b><i>medium</b></i> - среднаяя;</li>
+                  <li><b><i>high</b></i> - высокая.</li>
+               </ul>
+            </div>
          </div>
       </div>
    </div>

@@ -127,23 +127,43 @@ $this->devices_instance = [
             'precision' => 1
          ]
       ]
-   ],/*
+   ],
    'thermostat' => [
       'instance_name' => 'thermostat',
-      'description' => 'Режим работы',
-      'capability' => 'mode'
-   ],*/
+      'description' => 'Температурный режим',
+      'capability' => 'mode',
+      'parameters' => [
+         'modes' => [
+            ['value' => 'auto'],
+            ['value' => 'heat'],
+            ['value' => 'cool'],
+            ['value' => 'eco'],
+            ['value' => 'dry'],
+            ['value' => 'fan_only']
+         ],
+         'ordered' => true
+      ]
+   ],
    'mute' => [
       'instance_name' => 'mute',
       'description' => 'Режим без звука',
       'capability' => 'toggle',
       'default_value' => false
-   ],/*
+   ],
    'fan_speed' => [
       'instance_name' => 'fan_speed',
       'description' => 'Скорость вентиляции',
-      'capability' => 'mode'
-   ],
+      'capability' => 'mode',
+      'parameters' => [
+         'modes' => [
+            ['value' => 'auto'],
+            ['value' => 'low'],
+            ['value' => 'medium'],
+            ['value' => 'high']
+         ],
+         'ordered' => true
+      ]
+   ],/*
    'hsv' => [
       'instance_name' => 'hsv',
       'description' => 'Цвет в формате HSV',
