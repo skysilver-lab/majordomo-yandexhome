@@ -28,6 +28,10 @@ $this->devices_type = [
       'device_name' => 'media_device',
       'description' => 'Аудио и видеотехника'
    ],
+   'openable' => [
+      'device_name' => 'openable',
+      'description' => 'Дверь, ворота, окно'
+   ],
    'thermostat.ac' => [
       'device_name' => 'thermostat.ac',
       'description' => 'Кондиционер'
@@ -64,7 +68,10 @@ $this->devices_type = [
       'device_name' => 'cooking.kettle',
       'description' => 'Чайник'
    ],
-
+   'openable.curtain' => [
+      'device_name' => 'openable.curtain',
+      'description' => 'Шторы, жалюзи'
+   ]
 ];
 
 $this->devices_instance = [

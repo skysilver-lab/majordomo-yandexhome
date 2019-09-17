@@ -57,6 +57,14 @@
             </div>
          </div>
          <div class="form-group">
+            <div class="controls"><input type="checkbox" name="readonly_mode" value="1"[#if READONLY_MODE="1"#] checked[#endif#]> 
+               Автономный режим
+               <span class='support-hover' tabindex="1" data-title="При активации модуль переходит в режим &quot;только чтение&quot; и не реагирует на входящие команды управления устройствами (не выполняется запись в свойство объекта, привязанное к умению).">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </div>
+         </div>
+         <div class="form-group">
             <div class="controls"><input type="checkbox" name="log_debmes" value="1"[#if LOG_DEBMES="1"#] checked[#endif#]> 
                Отладка DebMes <span class="btn btn-link" data-toggle="modal" data-target="#module_info" title="Показать служебную информацию"><i class="glyphicon glyphicon-list-alt"></i></span>
             </div>
@@ -96,6 +104,7 @@
                <tr><td>OAuth2 Authorization code:</td><td><code>[#AUTHORIZATION_CODE#]</code></td></tr>
                <tr><td>OAuth2 Authorization code expires:</td><td><code>[#AUTHORIZATION_CODE_EXPIRES#]</code></td></tr>
                <tr><td>OAuth2 Redirect URL:</td><td><code>[#REDIRECT_URI#]</code></td></tr>
+               <tr><td>Автономный режим:</td><td><code>[#READONLY_MODE#]</code></td></tr>
                <tr><td>Отладка DebMes:</td><td><code>[#LOG_DEBMES#]</code></td></tr>
                <tr><td>Включать в лог ping:</td><td><code>[#LOG_PING#]</code></td></tr>
                <tr><td>Представление:</td><td><code>[#VIEW_STYLE#]</code></td></tr>

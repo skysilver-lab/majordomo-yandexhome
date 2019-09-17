@@ -3,7 +3,7 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2019 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 0.6b 2019/07/11
+* @version 0.7b 2019/09/17
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
@@ -146,6 +146,7 @@ class yandexhome extends module
       $out['LOG_DEBMES'] =  $this->config['LOG_DEBMES'];
       $out['LOG_PING']   =  $this->config['LOG_PING'];
       $out['VIEW_STYLE'] =  $this->config['VIEW_STYLE'];
+      $out['READONLY_MODE'] =  $this->config['READONLY_MODE'];
       $out['USER_ID']    =  md5($this->config['USER_NAME']);
 
       if ($this->view_mode == 'update_settings') {
@@ -156,6 +157,7 @@ class yandexhome extends module
          $this->config['LOG_DEBMES'] = gr('log_debmes');
          $this->config['LOG_PING']   = gr('log_ping');
          $this->config['VIEW_STYLE'] = gr('view_style');
+         $this->config['READONLY_MODE'] = gr('readonly_mode');
 
          $this->saveConfig();
 
@@ -715,8 +717,14 @@ class yandexhome extends module
                         break;
                   }
                   if (!$error_code) {
-                     setGlobal("$linked_object.$linked_property", $value, array($this->name => '0'));
-                     $this->WriteLog("Object '$linked_object', property '$linked_property', set value=$value");
+                     if ($this->config['READONLY_MODE'] != 1) {
+                        setGlobal("$linked_object.$linked_property", $value, array($this->name => '0'));
+                        $this->WriteLog("Object '$linked_object', property '$linked_property', set value=$value");
+                     } else {
+                        $this->WriteLog('The property of the object has not been set. The module is in read-only mode.');
+                        $error_code = 'NOT_SUPPORTED_IN_CURRENT_MODE';
+                        $error_message = 'The device is not controlled in this mode. The module is in read-only mode.';
+                     }
                   }
                } else {
                   $error_code = 'INVALID_ACTION';
@@ -829,6 +837,34 @@ class yandexhome extends module
       $message = "{$method} {$script} {$remoteip} <<< {$content}";
 
       return $message;
+   }
+
+   /**
+   *
+   * Активация автономного режима.
+   *
+   */
+   function ReadonlyModeEnable()
+   {
+      $this->getConfig();
+
+      $this->config['READONLY_MODE'] = 1;
+
+      $this->saveConfig();
+   }
+
+   /**
+   *
+   * Деактивация автономного режима.
+   *
+   */
+   function ReadonlyModeDisable()
+   {
+      $this->getConfig();
+
+      $this->config['READONLY_MODE'] = 0;
+
+      $this->saveConfig();
    }
 
    /**

@@ -107,7 +107,7 @@ if (!isset($request->server['PATH_INFO'])) {
             // Обработка запроса на разъединение аккаунтов.
             $response = $yandexhome->HandleUnlinkRequest($content);
          } else {
-            $yandexhome->WriteLog('smarthome.php === Unsupported API version!');
+            $yandexhome->WriteLog('smarthome.php === Unsupported API command!');
             header('HTTP/1.1 400 Bad Request');
          }
       } else {
