@@ -684,7 +684,7 @@ class yandexhome extends module
 
          foreach ($device['capabilities'] as $capability) {
 
-            $type = str_replace(PREFIX_CAPABILITIES, '', $capability['type']);
+            $type = $capability['type'];
             $value = $capability['state']['value'];
             $instance = $capability['state']['instance'];
 
