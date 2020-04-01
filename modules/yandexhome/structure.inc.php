@@ -8,19 +8,34 @@
       hsv
       rgb
       temperature_k
-   
+
    mode
       thermostat
       fan_speed
-   
+      cleanup_mode
+      coffee_mode
+      heat
+      input_source
+      program
+      swing
+      work_speed
+
    range
       brightness
       temperature
+      humidity
       volume
       channel
-   
+      open
+
    toggle
-      mute 
+      mute
+      backlight
+      controls_locked
+      ionization
+      keep_warm
+      oscillation
+      pause
 */
 
 $this->devices_type = [
@@ -36,6 +51,10 @@ $this->devices_type = [
       'device_name' => 'thermostat.ac',
       'description' => 'Кондиционер'
    ],
+   'cooking.coffee_maker' => [
+      'device_name' => 'cooking.coffee_maker',
+      'description' => 'Кофеварка'
+   ],
    'cooking' => [
       'device_name' => 'cooking',
       'description' => 'Кухонная техника'
@@ -44,9 +63,17 @@ $this->devices_type = [
       'device_name' => 'other',
       'description' => 'Остальные устройства'
    ],
+   'purifier' => [
+      'device_name' => 'purifier',
+      'description' => 'Очиститель воздуха'
+   ],
    'switch' => [
       'device_name' => 'switch',
       'description' => 'Переключатель'
+   ],
+   'vacuum_cleaner' => [
+      'device_name' => 'vacuum_cleaner',
+      'description' => 'Пылесос'
    ],
    'socket' => [
       'device_name' => 'socket',
@@ -56,6 +83,10 @@ $this->devices_type = [
       'device_name' => 'light',
       'description' => 'Свет'
    ],
+   'washing_machine' => [
+      'device_name' => 'washing_machine',
+      'description' => 'Стиральная машина'
+   ],
    'media_device.tv' => [
       'device_name' => 'media_device.tv',
       'description' => 'Телевизор'
@@ -63,6 +94,10 @@ $this->devices_type = [
    'thermostat' => [
       'device_name' => 'thermostat',
       'description' => 'Термостат'
+   ],
+   'humidifier' => [
+      'device_name' => 'humidifier',
+      'description' => 'Увлажнитель воздуха'
    ],
    'cooking.kettle' => [
       'device_name' => 'cooking.kettle',
@@ -151,9 +186,30 @@ $this->devices_instance = [
          'ordered' => true
       ]
    ],
+   'input_source' => [
+      'instance_name' => 'input_source',
+      'description' => 'Источник сигнала',
+      'capability' => 'mode',
+      'parameters' => [
+         'modes' => [
+            ['value' => 'one'],
+            ['value' => 'two'],
+            ['value' => 'three'],
+            ['value' => 'four'],
+            ['value' => 'five']
+         ],
+         'ordered' => false
+      ]
+   ],
    'mute' => [
       'instance_name' => 'mute',
       'description' => 'Режим без звука',
+      'capability' => 'toggle',
+      'default_value' => false
+   ],
+   'pause' => [
+      'instance_name' => 'pause',
+      'description' => 'Пауза',
       'capability' => 'toggle',
       'default_value' => false
    ],
