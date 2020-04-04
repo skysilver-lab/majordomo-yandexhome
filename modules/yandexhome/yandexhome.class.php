@@ -3,10 +3,11 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2020 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 0.8b 2020/04/01
+* @version 0.9b 2020/04/05
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
+const PREFIX_PROPERTIES = 'devices.properties.';
 const PREFIX_TYPES = 'devices.types.';
 const API_VERSION = '1.0';
 
@@ -405,17 +406,30 @@ class yandexhome extends module
             if ($rec['ID']) {
                // Собираем JSON-конфиг устройства согласно формату API Yandex Home.
                $traits = [];
+               $properties = [];
                if (is_array($new_dev_traits)) {
                   foreach ($new_dev_traits as $trait) {
                      $parameters = [];
-                     $trait_type = PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'];
+
+                     if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                        $trait_type = PREFIX_PROPERTIES . $this->devices_instance[$trait['type']]['capability'];
+                     } else {
+                        $trait_type = PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'];
+                     }
+
+                     if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                        $instance_name = str_replace('_sensor', '', $trait['type']);
+                     } else {
+                        $instance_name = $trait['type'];
+                     }
+
                      if (isset($devices_instance[$trait['type']]['parameters'])) {
                         $parameters = $devices_instance[$trait['type']]['parameters'];
                         if ($trait['type'] != 'rgb' && $trait['type'] != 'temperature_k') {
-                           $parameters['instance'] = $trait['type'];
+                           $parameters['instance'] = $instance_name;
                         }
                      } else {
-                        $parameters['instance'] = $trait['type'];
+                        $parameters['instance'] = $instance_name;
                      }
                      $check = false;
                      foreach ($traits as $key => $item) {
@@ -432,11 +446,19 @@ class yandexhome extends module
                         } else {
                            $retrievable = true;
                         }
-                        $traits[] = [
-                           'type' => $trait_type,
-                           'parameters' => $parameters,
-                           'retrievable' => $retrievable
-                        ];
+                        if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                           $properties[] = [
+                              'type' => $trait_type,
+                              'parameters' => $parameters,
+                              'retrievable' => $retrievable
+                           ];
+                        } else {
+                           $traits[] = [
+                              'type' => $trait_type,
+                              'parameters' => $parameters,
+                              'retrievable' => $retrievable
+                           ];
+                        }
                      }
                   }
                }
@@ -447,6 +469,7 @@ class yandexhome extends module
                                        'room' => $rec['ROOM'],
                                        'description' => $rec['DESCRIPTION'],
                                        'capabilities' => $traits,
+                                       'properties' => $properties,
                                        'device_info' => [
                                           'manufacturer' => $rec['MANUFACTURER'],
                                           'model' => $rec['MODEL'] . ' via MajorDoMo',
@@ -591,10 +614,15 @@ class yandexhome extends module
 
          if (is_array($rec) && !empty($rec['TRAITS'])) {
             $capabilities = [];
+            $properties = [];
             $traits = json_decode($rec['TRAITS'], true);
             if (is_array($traits)) {
                foreach ($traits as $trait) {
-                  $state['instance'] = $trait['type'];
+                  if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                     $state['instance'] = str_replace('_sensor', '', $trait['type']);
+                  } else {
+                     $state['instance'] = $trait['type'];
+                  }
                   if ($trait['linked_object'] != '' && $trait['linked_property'] != '') {
                      $linked_object = $trait['linked_object'];
                      $linked_property = $trait['linked_property'];
@@ -606,42 +634,50 @@ class yandexhome extends module
                   }
                   switch ($trait['type']) {
                      case 'on':
+                     case 'mute':
+                     case 'pause':
                         $state['value'] = $value ? true : false;
                         break;
-                     case 'brightness':
-                        $state['value'] = (int)$value;
+                     case 'amperage_sensor':
+                     case 'co2_level_sensor':
+                     case 'humidity_sensor':
+                     case 'power_sensor':
+                     case 'temperature_sensor':
+                     case 'voltage_sensor':
+                     case 'water_level_sensor':
+                        $state['value'] = floatval($value);
                         break;
                      case 'rgb':
                         $value = preg_replace('/^#/', '', $value);
                         $state['value'] = hexdec($value);
                         break;
+                     case 'brightness':
                      case 'temperature_k':
-                        $state['value'] = (int)$value;
-                        break;
                      case 'channel':
-                        $state['value'] = (int)$value;
-                        break;
                      case 'temperature':
-                        $state['value'] = (int)$value;
-                        break;
                      case 'volume':
                         $state['value'] = (int)$value;
-                        break;
-                     case 'mute':
-                        $state['value'] = $value ? true : false;
                         break;
                      default:
                         $state['value'] = $value;
                         break;
                   }
-                  $capabilities[] = [
-                     'type' => PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'],
-                     'state' => $state
-                  ];
+                  if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                     $properties[] = [
+                        'type' => PREFIX_PROPERTIES . $this->devices_instance[$trait['type']]['capability'],
+                        'state' => $state
+                     ];
+                  } else {
+                     $capabilities[] = [
+                        'type' => PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'],
+                        'state' => $state
+                     ];
+                  }
                }
                $devices[] = [
                   'id' => $device_id,
-                  'capabilities' => $capabilities
+                  'capabilities' => $capabilities,
+                  'properties' => $properties
                ];
             }
          } else {
@@ -701,7 +737,7 @@ class yandexhome extends module
                   $linked_object = $traits[$instance]['linked_object'];
                   $linked_property = $traits[$instance]['linked_property'];
                   switch (true) {
-                     case ($instance == 'on' || $instance == 'mute') :
+                     case ($instance == 'on' || $instance == 'mute' || $instance == 'pause') :
                         // Конвертируем true/false в 1/0.
                         $value = ($value === true) ? 1 : 0;
                         break;

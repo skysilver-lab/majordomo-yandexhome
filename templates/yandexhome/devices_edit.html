@@ -85,9 +85,15 @@
             <div class="input-group">
                <select id="select_trait" class="selectpicker form-control" title="Ничего не выбрано...">
                   <option data-content="" value=""></option>
+                  <optgroup label="Умения">
                   [#begin DEVICES_INSTANCE#]
                   <option data-content="[#description#] ([#instance_name#])" description="[#description#]" value="[#instance_name#]"></option>
+                  [#if instance_name=="brightness"#]
+                  </optgroup>
+                  <optgroup label="Датчики">
+                  [#endif#]
                   [#end DEVICES_INSTANCE#]
+                  </optgroup>
                </select>
                <span class="input-group-btn">
                   <button class="btn btn-default" type="button" onclick="addTrait();"><i class="glyphicon glyphicon-plus"></i></button>

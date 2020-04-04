@@ -254,5 +254,68 @@ $this->devices_instance = [
             'precision' => 1
          ]
       ]
+   ],
+   'amperage_sensor' => [
+      'instance_name' => 'amperage_sensor',
+      'description' => 'Сила тока',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.ampere'
+      ]
+   ],
+   'co2_level_sensor' => [
+      'instance_name' => 'co2_level_sensor',
+      'description' => 'Углекислый газ',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.ppm'
+      ]
+   ],
+   'humidity_sensor' => [
+      'instance_name' => 'humidity_sensor',
+      'description' => 'Влажность',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.percent'
+      ]
+   ],
+   'power_sensor' => [
+      'instance_name' => 'power_sensor',
+      'description' => 'Мощность',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.watt'
+      ]
+   ],
+   'temperature_sensor' => [
+      'instance_name' => 'temperature_sensor',
+      'description' => 'Температура',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.temperature.celsius'
+      ]
+   ],
+   'voltage_sensor' => [
+      'instance_name' => 'voltage_sensor',
+      'description' => 'Напряжение',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.volt'
+      ]
+   ],
+   'water_level_sensor' => [
+      'instance_name' => 'water_level_sensor',
+      'description' => 'Уровень воды',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.percent'
+      ]
    ]
 ];
