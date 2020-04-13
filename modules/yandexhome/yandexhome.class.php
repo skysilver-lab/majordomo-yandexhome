@@ -3,7 +3,7 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2020 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 0.9b 2020/04/05
+* @version 1.0b 2020/04/13
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
@@ -636,6 +636,11 @@ class yandexhome extends module
                      case 'on':
                      case 'mute':
                      case 'pause':
+                     case 'backlight':
+                     case 'keep_warm':
+                     case 'ionization':
+                     case 'oscillation':
+                     case 'controls_locked':
                         $state['value'] = $value ? true : false;
                         break;
                      case 'amperage_sensor':
@@ -736,19 +741,27 @@ class yandexhome extends module
                if (is_array($traits) && isset($traits[$instance]) && $traits[$instance]['linked_object'] != '' && $traits[$instance]['linked_property'] != '') {
                   $linked_object = $traits[$instance]['linked_object'];
                   $linked_property = $traits[$instance]['linked_property'];
-                  switch (true) {
-                     case ($instance == 'on' || $instance == 'mute' || $instance == 'pause') :
+                  switch ($instance) {
+                     case 'on':
+                     case 'mute':
+                     case 'pause':
+                     case 'backlight':
+                     case 'keep_warm':
+                     case 'ionization':
+                     case 'oscillation':
+                     case 'controls_locked':
                         // Конвертируем true/false в 1/0.
                         $value = ($value === true) ? 1 : 0;
                         break;
-                     case ($instance == 'volume' || $instance == 'channel') :
+                     case 'volume':
+                     case 'channel':
                         if (isset($capability['state']['relative']) && $capability['state']['relative'] === true) {
                            $cur_val = getGlobal("$linked_object.$linked_property");
                            $value = $cur_val + $value;
                            if ($value < 0) $value = 0;
                         }
                         break;
-                     case ($instance == 'rgb') :
+                     case 'rgb':
                         $value = str_pad(dechex($value), 6, '0', STR_PAD_LEFT);
                         break;
                   }

@@ -1,6 +1,8 @@
 <?php
 
 /*
+   https://yandex.ru/dev/dialogs/alice/doc/smart-home/about-docpage/
+
    on_off
       on
 
@@ -42,6 +44,10 @@ $this->devices_type = [
    'media_device' => [
       'device_name' => 'media_device',
       'description' => 'Аудио и видеотехника'
+   ],
+   'media_device.receiver' => [
+      'device_name' => 'media_device.receiver',
+      'description' => 'AV-ресивер'
    ],
    'openable' => [
       'device_name' => 'openable',
@@ -91,6 +97,10 @@ $this->devices_type = [
       'device_name' => 'media_device.tv',
       'description' => 'Телевизор'
    ],
+   'media_device.tv_box' => [
+      'device_name' => 'media_device.tv_box',
+      'description' => 'ТВ-приставка'
+   ],
    'thermostat' => [
       'device_name' => 'thermostat',
       'description' => 'Термостат'
@@ -134,7 +144,6 @@ $this->devices_instance = [
       'description' => 'ТВ-канал',
       'capability' => 'range',
       'default_value' => 1,
-      'retrievable' => false,
       'parameters' => [
          'range' => [
             'min' => 0,
@@ -190,6 +199,7 @@ $this->devices_instance = [
       'instance_name' => 'input_source',
       'description' => 'Источник сигнала',
       'capability' => 'mode',
+      'default_value' => 'one',
       'parameters' => [
          'modes' => [
             ['value' => 'one'],
@@ -201,9 +211,39 @@ $this->devices_instance = [
          'ordered' => false
       ]
    ],
+   'controls_locked' => [
+      'instance_name' => 'controls_locked',
+      'description' => 'Блокировка управления',
+      'capability' => 'toggle',
+      'default_value' => false
+   ],
+   'backlight' => [
+      'instance_name' => 'backlight',
+      'description' => 'Подсветка',
+      'capability' => 'toggle',
+      'default_value' => false
+   ],
    'mute' => [
       'instance_name' => 'mute',
       'description' => 'Режим без звука',
+      'capability' => 'toggle',
+      'default_value' => false
+   ],
+   'oscillation' => [
+      'instance_name' => 'oscillation',
+      'description' => 'Режим вращения',
+      'capability' => 'toggle',
+      'default_value' => false
+   ],
+   'ionization' => [
+      'instance_name' => 'ionization',
+      'description' => 'Режим ионизации',
+      'capability' => 'toggle',
+      'default_value' => false
+   ],
+   'keep_warm' => [
+      'instance_name' => 'keep_warm',
+      'description' => 'Режим поддержания тепла',
       'capability' => 'toggle',
       'default_value' => false
    ],
