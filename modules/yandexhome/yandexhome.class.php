@@ -3,7 +3,7 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2020 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 1.0b 2020/04/13
+* @version 1.1b 2020/04/27
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
@@ -729,7 +729,13 @@ class yandexhome extends module
             $value = $capability['state']['value'];
             $instance = $capability['state']['instance'];
 
-            $this->WriteLog("Capabilities type '$type', instance '$instance', value=" . json_encode($value));
+            if (isset($capability['state']['relative']) && $capability['state']['relative'] === true) {
+               $relative = true;
+            } else {
+               $relative = false;
+            }
+
+            $this->WriteLog("Capabilities type '$type', instance '$instance', relative=" . (($relative === true) ? 1 : 0) . ", value=" . json_encode($value));
 
             $linked_object = '';
             $linked_property = '';
@@ -741,6 +747,12 @@ class yandexhome extends module
                if (is_array($traits) && isset($traits[$instance]) && $traits[$instance]['linked_object'] != '' && $traits[$instance]['linked_property'] != '') {
                   $linked_object = $traits[$instance]['linked_object'];
                   $linked_property = $traits[$instance]['linked_property'];
+
+                  if ($relative) {
+                     $cur_val = getGlobal("$linked_object.$linked_property");
+                     $value = $cur_val + $value;
+                  }
+
                   switch ($instance) {
                      case 'on':
                      case 'mute':
@@ -752,14 +764,6 @@ class yandexhome extends module
                      case 'controls_locked':
                         // Конвертируем true/false в 1/0.
                         $value = ($value === true) ? 1 : 0;
-                        break;
-                     case 'volume':
-                     case 'channel':
-                        if (isset($capability['state']['relative']) && $capability['state']['relative'] === true) {
-                           $cur_val = getGlobal("$linked_object.$linked_property");
-                           $value = $cur_val + $value;
-                           if ($value < 0) $value = 0;
-                        }
                         break;
                      case 'rgb':
                         $value = str_pad(dechex($value), 6, '0', STR_PAD_LEFT);
