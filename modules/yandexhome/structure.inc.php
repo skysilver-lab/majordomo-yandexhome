@@ -357,5 +357,14 @@ $this->devices_instance = [
       'parameters' => [
          'unit' => 'unit.percent'
       ]
+   ],
+   'battery_level_sensor' => [
+      'instance_name' => 'battery_level_sensor',
+      'description' => 'Уровень заряда',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.percent'
+      ]
    ]
 ];

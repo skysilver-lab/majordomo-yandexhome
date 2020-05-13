@@ -3,7 +3,7 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2020 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 1.1b 2020/04/27
+* @version 1.2b 2020/05/13
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
@@ -650,6 +650,7 @@ class yandexhome extends module
                      case 'temperature_sensor':
                      case 'voltage_sensor':
                      case 'water_level_sensor':
+                     case 'battery_level_sensor':
                         $state['value'] = floatval($value);
                         break;
                      case 'rgb':
