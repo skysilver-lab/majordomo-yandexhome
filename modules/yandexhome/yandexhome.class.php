@@ -2,8 +2,8 @@
 /**
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
-* @copyright 2020 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 1.2b 2020/05/13
+* @copyright 2021 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
+* @version 1.3b 2021/01/27
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';

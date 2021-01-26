@@ -49,6 +49,10 @@ $this->devices_type = [
       'device_name' => 'media_device.receiver',
       'description' => 'AV-ресивер'
    ],
+   'sensor' => [
+      'device_name' => 'sensor',
+      'description' => 'Датчик'
+   ],
    'openable' => [
       'device_name' => 'openable',
       'description' => 'Дверь, ворота, окно'
@@ -65,6 +69,10 @@ $this->devices_type = [
       'device_name' => 'cooking',
       'description' => 'Кухонная техника'
    ],
+   'cooking.multicooker' => [
+      'device_name' => 'cooking.multicooker',
+      'description' => 'Мультиварка'
+   ],
    'other' => [
       'device_name' => 'other',
       'description' => 'Остальные устройства'
@@ -80,6 +88,10 @@ $this->devices_type = [
    'vacuum_cleaner' => [
       'device_name' => 'vacuum_cleaner',
       'description' => 'Пылесос'
+   ],
+   'dishwasher' => [
+      'device_name' => 'dishwasher',
+      'description' => 'Посудомоечная машина'
    ],
    'socket' => [
       'device_name' => 'socket',
@@ -116,6 +128,10 @@ $this->devices_type = [
    'openable.curtain' => [
       'device_name' => 'openable.curtain',
       'description' => 'Шторы, жалюзи'
+   ],
+   'iron' => [
+      'device_name' => 'iron',
+      'description' => 'Утюг, парогенератор'
    ]
 ];
 
