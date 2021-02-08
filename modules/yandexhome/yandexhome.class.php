@@ -3,7 +3,7 @@
 * Главный класс модуля Yandex Home
 * @author <skysilver.da@gmail.com>
 * @copyright 2021 Agaphonov Dmitri aka skysilver <skysilver.da@gmail.com> (c)
-* @version 1.3b 2021/01/27
+* @version 1.4b 2021/02/08
 */
 
 const PREFIX_CAPABILITIES = 'devices.capabilities.';
@@ -657,11 +657,13 @@ class yandexhome extends module
                         $value = preg_replace('/^#/', '', $value);
                         $state['value'] = hexdec($value);
                         break;
-                     case 'brightness':
-                     case 'temperature_k':
-                     case 'channel':
-                     case 'temperature':
+                     case 'open':
                      case 'volume':
+                     case 'channel':
+                     case 'humidity':
+                     case 'brightness':
+                     case 'temperature':
+                     case 'temperature_k':
                         $state['value'] = (int)$value;
                         break;
                      default:

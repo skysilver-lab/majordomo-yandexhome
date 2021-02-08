@@ -1,45 +1,5 @@
 <?php
 
-/*
-   https://yandex.ru/dev/dialogs/alice/doc/smart-home/about-docpage/
-
-   on_off
-      on
-
-   color_setting
-      hsv
-      rgb
-      temperature_k
-
-   mode
-      thermostat
-      fan_speed
-      cleanup_mode
-      coffee_mode
-      heat
-      input_source
-      program
-      swing
-      work_speed
-
-   range
-      brightness
-      temperature
-      humidity
-      volume
-      channel
-      open
-
-   toggle
-      mute
-      backlight
-      controls_locked
-      ionization
-      keep_warm
-      oscillation
-      pause
-*/
-
 $this->devices_type = [
    'media_device' => [
       'device_name' => 'media_device',
@@ -136,11 +96,31 @@ $this->devices_type = [
 ];
 
 $this->devices_instance = [
+   'controls_locked' => [
+      'instance_name' => 'controls_locked',
+      'description' => 'Блокировка управления',
+      'capability' => 'toggle',
+      'default_value' => false
+   ],
    'on' => [
       'instance_name' => 'on',
       'description' => 'Включить/выключить',
       'capability' => 'on_off',
       'default_value' => 0
+   ],
+   'humidity' => [
+      'instance_name' => 'humidity',
+      'description' => 'Влажность',
+      'capability' => 'range',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.percent',
+         'range' => [
+            'min' => 0,
+            'max' => 100,
+            'precision' => 5
+         ]
+      ]
    ],
    'volume' => [
       'instance_name' => 'volume',
@@ -153,62 +133,6 @@ $this->devices_instance = [
             'max' => 100,
             'precision' => 1
          ]
-      ]
-   ],
-   'channel' => [
-      'instance_name' => 'channel',
-      'description' => 'ТВ-канал',
-      'capability' => 'range',
-      'default_value' => 1,
-      'parameters' => [
-         'range' => [
-            'min' => 0,
-            'max' => 999,
-            'precision' => 1
-         ]
-      ]
-   ],
-   'temperature' => [
-      'instance_name' => 'temperature',
-      'description' => 'Температура',
-      'capability' => 'range',
-      'default_value' => 20,
-      'parameters' => [
-         'unit' => 'unit.temperature.celsius',
-         'range' => [
-            'min' => 1,
-            'max' => 100,
-            'precision' => 1
-         ]
-      ]
-   ],
-   'temperature_k' => [
-      'instance_name' => 'temperature_k',
-      'description' => 'Цветовая температура',
-      'capability' => 'color_setting',
-      'default_value' => 4500,
-      'parameters' => [
-         'temperature_k' => [
-            'min' => 2700,
-            'max' => 9000,
-            'precision' => 1
-         ]
-      ]
-   ],
-   'thermostat' => [
-      'instance_name' => 'thermostat',
-      'description' => 'Температурный режим',
-      'capability' => 'mode',
-      'parameters' => [
-         'modes' => [
-            ['value' => 'auto'],
-            ['value' => 'heat'],
-            ['value' => 'cool'],
-            ['value' => 'eco'],
-            ['value' => 'dry'],
-            ['value' => 'fan_only']
-         ],
-         'ordered' => true
       ]
    ],
    'input_source' => [
@@ -227,9 +151,9 @@ $this->devices_instance = [
          'ordered' => false
       ]
    ],
-   'controls_locked' => [
-      'instance_name' => 'controls_locked',
-      'description' => 'Блокировка управления',
+   'pause' => [
+      'instance_name' => 'pause',
+      'description' => 'Пауза',
       'capability' => 'toggle',
       'default_value' => false
    ],
@@ -263,12 +187,6 @@ $this->devices_instance = [
       'capability' => 'toggle',
       'default_value' => false
    ],
-   'pause' => [
-      'instance_name' => 'pause',
-      'description' => 'Пауза',
-      'capability' => 'toggle',
-      'default_value' => false
-   ],
    'fan_speed' => [
       'instance_name' => 'fan_speed',
       'description' => 'Скорость вентиляции',
@@ -282,12 +200,77 @@ $this->devices_instance = [
          ],
          'ordered' => true
       ]
-   ],/*
-   'hsv' => [
-      'instance_name' => 'hsv',
-      'description' => 'Цвет в формате HSV',
-      'capability' => 'color_setting'
-   ],*/
+   ],
+   'open' => [
+      'instance_name' => 'open',
+      'description' => 'Степень открытия',
+      'capability' => 'range',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.percent',
+         'range' => [
+            'min' => 0,
+            'max' => 100,
+            'precision' => 10
+         ]
+      ]
+   ],
+   'channel' => [
+      'instance_name' => 'channel',
+      'description' => 'ТВ-канал',
+      'capability' => 'range',
+      'default_value' => 1,
+      'parameters' => [
+         'range' => [
+            'min' => 0,
+            'max' => 999,
+            'precision' => 1
+         ]
+      ]
+   ],
+   'temperature' => [
+      'instance_name' => 'temperature',
+      'description' => 'Температура',
+      'capability' => 'range',
+      'default_value' => 20,
+      'parameters' => [
+         'unit' => 'unit.temperature.celsius',
+         'range' => [
+            'min' => 1,
+            'max' => 100,
+            'precision' => 1
+         ]
+      ]
+   ],
+   'thermostat' => [
+      'instance_name' => 'thermostat',
+      'description' => 'Температурный режим',
+      'capability' => 'mode',
+      'parameters' => [
+         'modes' => [
+            ['value' => 'auto'],
+            ['value' => 'heat'],
+            ['value' => 'cool'],
+            ['value' => 'eco'],
+            ['value' => 'dry'],
+            ['value' => 'fan_only']
+         ],
+         'ordered' => true
+      ]
+   ],
+   'temperature_k' => [
+      'instance_name' => 'temperature_k',
+      'description' => 'Цветовая температура',
+      'capability' => 'color_setting',
+      'default_value' => 4500,
+      'parameters' => [
+         'temperature_k' => [
+            'min' => 2700,
+            'max' => 9000,
+            'precision' => 1
+         ]
+      ]
+   ],
    'rgb' => [
       'instance_name' => 'rgb',
       'description' => 'Цвет в формате RGB',
