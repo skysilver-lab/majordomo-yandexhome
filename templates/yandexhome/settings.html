@@ -1,4 +1,4 @@
-﻿<!--# Область настроек. #-->
+<!--# Область настроек. #-->
 <div class="collapse" id='api_settings'>
    &nbsp;
    <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
@@ -42,6 +42,16 @@
             <span class="btn btn-link" onclick="generateClientKey();" title="Генерировать случайный"><i class="glyphicon glyphicon-refresh"></i></span>
          </div>
          <div class="form-group">
+            <label class="control-label">SKILL_ACCESS_TOKEN
+               <span class='support-hover' tabindex="1" data-title="https://yandex.ru/dev/dialogs/smart-home/doc/reference-alerts/resources-alerts.html">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </label>
+            <div class="col-lg-4">
+               <input class="form-control" type="text" name="skill_access_token" id="skill_access_token" value="[#if SKILL_ACCESS_TOKEN!=""#][#SKILL_ACCESS_TOKEN#][#endif#]" class="input">
+            </div>
+         </div>
+         <div class="form-group">
             <label class="control-label">Представление
                <span class='support-hover' tabindex="1" data-title="Стиль отображения списка устройств на главной странице модуля. Табличный вид - без группировки и с группировкой по местоположению. Панельный вид - без группировки и с группировкой по местоположению.">
                   <i class="glyphicon glyphicon-info-sign"></i>
@@ -57,7 +67,7 @@
             </div>
          </div>
          <div class="form-group">
-            <div class="controls"><input type="checkbox" name="readonly_mode" value="1"[#if READONLY_MODE="1"#] checked[#endif#]> 
+            <div class="controls"><input type="checkbox" name="readonly_mode" value="1"[#if READONLY_MODE="1"#] checked[#endif#]>
                Автономный режим
                <span class='support-hover' tabindex="1" data-title="При активации модуль переходит в режим &quot;только чтение&quot; и не реагирует на входящие команды управления устройствами (не выполняется запись в свойство объекта, привязанное к умению).">
                   <i class="glyphicon glyphicon-info-sign"></i>
@@ -65,12 +75,12 @@
             </div>
          </div>
          <div class="form-group">
-            <div class="controls"><input type="checkbox" name="log_debmes" value="1"[#if LOG_DEBMES="1"#] checked[#endif#]> 
+            <div class="controls"><input type="checkbox" name="log_debmes" value="1"[#if LOG_DEBMES="1"#] checked[#endif#]>
                Отладка DebMes <span class="btn btn-link" data-toggle="modal" data-target="#module_info" title="Показать служебную информацию"><i class="glyphicon glyphicon-list-alt"></i></span>
             </div>
          </div>
          <div class="form-group">
-            <div class="controls"><input type="checkbox" name="log_ping" value="1"[#if LOG_PING="1"#] checked[#endif#]> 
+            <div class="controls"><input type="checkbox" name="log_ping" value="1"[#if LOG_PING="1"#] checked[#endif#]>
                Включать в лог <b>ping</b>-запросы
             </div>
          </div>
