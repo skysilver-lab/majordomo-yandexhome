@@ -1,4 +1,4 @@
-﻿<!--# Вкладка 'Общее'. #-->
+<!--# Вкладка 'Общее'. #-->
 <link rel="stylesheet" href="../templates/yandexhome/css/bootstrap-select.min.css">
 
 <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
@@ -90,7 +90,11 @@
                   <option data-content="[#description#] ([#instance_name#])" description="[#description#]" value="[#instance_name#]"></option>
                   [#if instance_name=="brightness"#]
                   </optgroup>
-                  <optgroup label="Датчики">
+                  <optgroup label="Датчики числовые">
+                  [#endif#]
+                  [#if instance_name=="water_level_sensor"#]
+                  </optgroup>
+                  <optgroup label="Датчики логические">
                   [#endif#]
                   [#end DEVICES_INSTANCE#]
                   </optgroup>
@@ -180,7 +184,7 @@ script.onload = function() {
             }
          }
       }
-   } 
+   }
 
    if (traits_json !== '') {
       var traits = tryParseJSON(traits_json);
@@ -226,7 +230,7 @@ script.onload = function() {
       selector: '.popover_instance',
       container: 'body',
       placement: 'top',
-      html: true 
+      html: true
    });
 
    //console.log('stop');
@@ -304,7 +308,7 @@ function addTraitRow(linked_type, linked_description, linked_object, linked_prop
 
    if (instance_list[linked_type].capability === 'range') {
       if (typeof(instance_list[linked_type].parameters) != 'undefined' && instance_list[linked_type].parameters !== null) {
-         range_options = 
+         range_options =
          `<span id="options${linked_type}" data-instance="${linked_type}" class="btn btn-link popover_instance" style="max-width: 250px;" data-toggle="popover" title="Дополнительные опции" data-content=''><i class="glyphicon glyphicon-cog"></i></span>`;
          isPopover = true;
       }
@@ -414,7 +418,7 @@ function getInstanceOptions(linked_type, init) {
          <input type="text" class="form-control" aria-describedby="basic-addon3" id="precision_value${linked_type}" value="${precision_value}">
       </div>
       <div style="line-height: 50%;">&nbsp</div>
-      <div class="text-center"> 
+      <div class="text-center">
          <span id="${linked_type}" class="btn btn-success btn-sm" onclick="saveInstanceOptions(this);"><i class="glyphicon glyphicon-ok"></i></span>&nbsp
          <span id="${linked_type}" class="btn btn-default btn-sm" onclick="closePopover(this);"><i class="glyphicon glyphicon-remove"></i></span>
       </div>`;
@@ -451,7 +455,7 @@ function initPopovers() {
       selector: '.popover_instance',
       container: 'body',
       placement: 'top',
-      html: true 
+      html: true
    });
 
    $popovers.on('show.bs.popover', function () {
