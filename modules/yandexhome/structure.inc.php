@@ -303,6 +303,15 @@ $this->devices_instance = [
          'unit' => 'unit.ampere'
       ]
    ],
+   'battery_level_sensor' => [
+      'instance_name' => 'battery_level_sensor',
+      'description' => 'Уровень заряда',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.percent'
+      ]
+   ],
    'co2_level_sensor' => [
       'instance_name' => 'co2_level_sensor',
       'description' => 'Углекислый газ',
@@ -321,6 +330,42 @@ $this->devices_instance = [
          'unit' => 'unit.percent'
       ]
    ],
+   'illumination_sensor' => [
+      'instance_name' => 'illumination_sensor',
+      'description' => 'Освещенность',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.illumination.lux'
+      ]
+   ],
+   'pm1_density_sensor' => [
+      'instance_name' => 'pm1_density_sensor',
+      'description' => 'Загрязнение воздуха частицами PM1',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.density.mcg_m3'
+      ]
+   ],
+   'pm2.5_density_sensor' => [
+      'instance_name' => 'pm2.5_density_sensor',
+      'description' => 'Загрязнение воздуха частицами PM2.5',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.density.mcg_m3'
+      ]
+   ],
+   'pm10_density_sensor' => [
+      'instance_name' => 'pm10_density_sensor',
+      'description' => 'Загрязнение воздуха частицами PM10',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.density.mcg_m3'
+      ]
+   ],
    'power_sensor' => [
       'instance_name' => 'power_sensor',
       'description' => 'Мощность',
@@ -330,6 +375,15 @@ $this->devices_instance = [
          'unit' => 'unit.watt'
       ]
    ],
+   'pressure_sensor' => [
+      'instance_name' => 'pressure_sensor',
+      'description' => 'Давление мм. рт. ст.',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.pressure.mmhg'
+      ]
+   ],
    'temperature_sensor' => [
       'instance_name' => 'temperature_sensor',
       'description' => 'Температура',
@@ -337,6 +391,15 @@ $this->devices_instance = [
       'default_value' => 0,
       'parameters' => [
          'unit' => 'unit.temperature.celsius'
+      ]
+   ],
+   'tvoc_sensor' => [
+      'instance_name' => 'tvoc_sensor',
+      'description' => 'Загрязнение воздуха ограническими веществами',
+      'capability' => 'float',
+      'default_value' => 0,
+      'parameters' => [
+         'unit' => 'unit.density.mcg_m3'
       ]
    ],
    'voltage_sensor' => [
@@ -357,13 +420,91 @@ $this->devices_instance = [
          'unit' => 'unit.percent'
       ]
    ],
-   'battery_level_sensor' => [
-      'instance_name' => 'battery_level_sensor',
-      'description' => 'Уровень заряда',
-      'capability' => 'float',
+   'vibration_sensor' => [
+      'instance_name' => 'vibration_sensor',
+      'description' => 'Датчик вибрации/падения/переворачивания',
+      'capability' => 'event',
       'default_value' => 0,
       'parameters' => [
-         'unit' => 'unit.percent'
+         'events' => [
+            ['value' => 'tilt'],
+            ['value' => 'fall'],
+         ]
       ]
-   ]
+   ],
+   'open_sensor' => [
+      'instance_name' => 'open_sensor',
+      'description' => 'Датчик открытия/закрытия',
+      'capability' => 'event',
+      'default_value' => 0,
+      'parameters' => [
+         'events' => [
+            ['value' => 'opened'],
+            ['value' => 'closed'],
+         ]
+      ]
+   ],
+   'button_sensor' => [
+      'instance_name' => 'button_sensor',
+      'description' => 'Событие нажатия кнопки',
+      'capability' => 'event',
+      'default_value' => 0,
+      'parameters' => [
+         'events' => [
+            ['value' => 'click'],
+            ['value' => 'double_click'],
+            ['value' => 'long_press'],
+         ]
+      ]
+   ],
+   'motion_sensor' => [
+      'instance_name' => 'motion_sensor',
+      'description' => 'Датчик движения',
+      'capability' => 'event',
+      'default_value' => 0,
+      'parameters' => [
+         'events' => [
+            ['value' => 'detected'],
+            ['value' => 'not_detected'],
+         ]
+      ]
+   ],
+   'smoke_sensor' => [
+      'instance_name' => 'smoke_sensor',
+      'description' => 'Датчик дыма',
+      'capability' => 'event',
+      'default_value' => 0,
+      'parameters' => [
+         'events' => [
+            ['value' => 'detected'],
+            ['value' => 'not_detected'],
+            ['value' => 'high'],
+         ]
+      ]
+   ],
+   'gas_sensor' => [
+      'instance_name' => 'gas_sensor',
+      'description' => 'Датчик наличия газа в помещении',
+      'capability' => 'event',
+      'default_value' => 0,
+      'parameters' => [
+         'events' => [
+            ['value' => 'detected'],
+            ['value' => 'not_detected'],
+            ['value' => 'high'],
+         ]
+      ]
+   ],
+   'water_leak_sensor' => [
+      'instance_name' => 'water_leak_sensor',
+      'description' => 'Датчик протечки',
+      'capability' => 'event',
+      'default_value' => 0,
+      'parameters' => [
+         'events' => [
+            ['value' => 'dry'],
+            ['value' => 'leak'],
+         ]
+      ]
+   ],
 ];
