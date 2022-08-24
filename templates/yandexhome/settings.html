@@ -9,7 +9,7 @@
                   <i class="glyphicon glyphicon-info-sign"></i>
                </span>
             </label>
-            <div class="col-lg-4"><input class="form-control" type="text" autocomplete="username" name="user_name" value="[#if USER_NAME!=""#][#USER_NAME#][#endif#]" class="input"></div>
+            <div class="col-lg-8"><input class="form-control" type="text" autocomplete="username" name="user_name" value="[#if USER_NAME!=""#][#USER_NAME#][#endif#]" class="input"></div>
          </div>
          <div class="form-group">
             <label class="control-label">Пароль пользователя
@@ -17,7 +17,7 @@
                   <i class="glyphicon glyphicon-info-sign"></i>
                </span>
             </label>
-            <div class="col-lg-4"><input class="form-control" type="password" autocomplete="current-password" name="user_pass" value="[#if USER_PASS!=""#][#USER_PASS#][#endif#]" class="input"></div>
+            <div class="col-lg-8"><input class="form-control" type="password" autocomplete="current-password" name="user_pass" value="[#if USER_PASS!=""#][#USER_PASS#][#endif#]" class="input"></div>
          </div>
          <div class="form-group">
             <label class="control-label">OAuth2 ID навыка
@@ -25,7 +25,7 @@
                   <i class="glyphicon glyphicon-info-sign"></i>
                </span>
             </label>
-            <div class="col-lg-4">
+            <div class="col-lg-8">
                <input class="form-control" type="text" name="client_id" id="client_id" value="[#if CLIENT_ID!=""#][#CLIENT_ID#][#endif#]" class="input">
             </div>
             <span class="btn btn-link" onclick="generateClientId();" title="Генерировать случайный"><i class="glyphicon glyphicon-refresh"></i></span>
@@ -36,19 +36,25 @@
                   <i class="glyphicon glyphicon-info-sign"></i>
                </span>
             </label>
-            <div class="col-lg-4">
+            <div class="col-lg-8">
                <input class="form-control" type="text" name="client_key" id="client_key" value="[#if CLIENT_KEY!=""#][#CLIENT_KEY#][#endif#]" class="input">
             </div>
             <span class="btn btn-link" onclick="generateClientKey();" title="Генерировать случайный"><i class="glyphicon glyphicon-refresh"></i></span>
          </div>
          <div class="form-group">
-            <label class="control-label">SKILL_ACCESS_TOKEN
+            <label class="control-label">OAuth2 User Token
                <span class='support-hover' tabindex="1" data-title="https://yandex.ru/dev/dialogs/smart-home/doc/reference-alerts/resources-alerts.html">
                   <i class="glyphicon glyphicon-info-sign"></i>
                </span>
             </label>
-            <div class="col-lg-4">
+            <div class="col-lg-8">
                <input class="form-control" type="text" name="skill_access_token" id="skill_access_token" value="[#if SKILL_ACCESS_TOKEN!=""#][#SKILL_ACCESS_TOKEN#][#endif#]" class="input">
+			   
+			   <div class="alert alert-warning" style="margin-top: 10px; margin-bottom: 0px">
+					Необезателен! Требуется для активации дополнительного функционала, такого как: участие датчиков в сценариях Яндекс, автоматическая запись и хранение истории датчика на сервере Яндекс. Для получения токена перейдите <a href="https://yandex.ru/dev/dialogs/smart-home/doc/reference-alerts/resources-alerts.html#resources-alerts__oauth" target="_blank">сюда</a> под той учетной записью, под которой создан навык и нажмите на ссылку <b>OAuth-токен для Диалогов</b> - на экране появится токен. После этого сделайте свой навык ПУБЛИЧНЫМ, сохраните, но не отправляйте на модерацию!
+					<br>
+					Так же, <b>OAuth2 KEY навыка</b> должен совпадать с <a href="https://dialogs.yandex.ru/developer" target="_blank"><b>Идентификатор диалога</b></a>, если нет - измените его вручную!
+				</div>
             </div>
          </div>
          <div class="form-group">
@@ -57,7 +63,7 @@
                   <i class="glyphicon glyphicon-info-sign"></i>
                </span>
             </label>
-            <div class="col-lg-4">
+            <div class="col-lg-8">
                <select name="view_style" class="form-control">
                   <option value="table" [#if VIEW_STYLE="table"#] selected[#endif#]>Таблица</option>
                   <option value="table_group" [#if VIEW_STYLE="table_group"#] selected[#endif#]>Таблица с группировкой</option>
