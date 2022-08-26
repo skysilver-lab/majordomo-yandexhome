@@ -144,6 +144,7 @@ class yandexhome extends module
       $out['USER_PASS']  =  $this->config['USER_PASS'];
       $out['CLIENT_ID']  =  $this->config['CLIENT_ID'];
       $out['CLIENT_KEY'] =  $this->config['CLIENT_KEY'];
+      $out['SKILL_ACCESS_TOKEN'] =  $this->config['SKILL_ACCESS_TOKEN'];
       $out['LOG_DEBMES'] =  $this->config['LOG_DEBMES'];
       $out['LOG_PING']   =  $this->config['LOG_PING'];
       $out['VIEW_STYLE'] =  $this->config['VIEW_STYLE'];
@@ -155,6 +156,7 @@ class yandexhome extends module
          $this->config['USER_PASS']  = gr('user_pass');
          $this->config['CLIENT_ID']  = gr('client_id');
          $this->config['CLIENT_KEY'] = gr('client_key');
+         $this->config['SKILL_ACCESS_TOKEN'] = gr('skill_access_token');
          $this->config['LOG_DEBMES'] = gr('log_debmes');
          $this->config['LOG_PING']   = gr('log_ping');
          $this->config['VIEW_STYLE'] = gr('view_style');
@@ -410,14 +412,17 @@ class yandexhome extends module
                if (is_array($new_dev_traits)) {
                   foreach ($new_dev_traits as $trait) {
                      $parameters = [];
+					 
+					 //Отправка в Яндекс
+					 $trait['reportable'] = ($trait['reportable'] != null) ?? false;
 
-                     if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                     if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
                         $trait_type = PREFIX_PROPERTIES . $this->devices_instance[$trait['type']]['capability'];
                      } else {
                         $trait_type = PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'];
                      }
 
-                     if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                     if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
                         $instance_name = str_replace('_sensor', '', $trait['type']);
                      } else {
                         $instance_name = $trait['type'];
@@ -446,22 +451,26 @@ class yandexhome extends module
                         } else {
                            $retrievable = true;
                         }
-                        if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+						
+                        if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
                            $properties[] = [
                               'type' => $trait_type,
                               'parameters' => $parameters,
-                              'retrievable' => $retrievable
+                              'retrievable' => $retrievable,
+                              'reportable' => $trait['reportable']
                            ];
                         } else {
                            $traits[] = [
                               'type' => $trait_type,
                               'parameters' => $parameters,
-                              'retrievable' => $retrievable
+                              'retrievable' => $retrievable,
+                              'reportable' => $trait['reportable']
                            ];
                         }
                      }
                   }
                }
+
                $rec['CONFIG'] =  json_encode([
                                        'id' => $rec['ID'],
                                        'name' => $rec['TITLE'],
@@ -472,7 +481,7 @@ class yandexhome extends module
                                        'properties' => $properties,
                                        'device_info' => [
                                           'manufacturer' => $rec['MANUFACTURER'],
-                                          'model' => $rec['MODEL'] . ' via MajorDoMo',
+                                          'model' => $rec['MODEL'] . ' | MajorDoMo',
                                           'hw_version' => $rec['HW_VERSION'],
                                           'sw_version' => $rec['SW_VERSION']
                                        ]
@@ -526,7 +535,7 @@ class yandexhome extends module
                         removeLinkedProperty($old_linked_object, $old_linked_property, $this->name);
                         $this->WriteLog("removeLinkedProperty for $old_linked_object and $old_linked_property");
                      }
-                     
+
                      // Если поля привязанного объекта и свойства не пустые  и не совпадают с предыдущими, то проставляем линк.
                      if ($linked_object != '' && $linked_property != '' && ($linked_object.$linked_property != $old_linked_object.$old_linked_property)) {
                         addLinkedProperty($linked_object, $linked_property, $this->name);
@@ -563,11 +572,137 @@ class yandexhome extends module
    * Обработка событий смены значений привязанных к метрикам свойств объектов.
    *
    */
+
    function PropertySetHandle($object, $property, $value)
    {
+//       return;
       // TODO: отправка статусов в Yandex по факту изменения свойства объекта (если появится поддержка в API).
 
       $this->WriteLog("PropertySetHandle for object '$object' and property '$property' and value=$value");
+      $devices = SQLSelect("SELECT * FROM yandexhome_devices WHERE TRAITS LIKE '%$object%' AND  TRAITS LIKE '%$property%'" );
+      foreach($devices as $device)
+      {
+            $traits = json_decode($device['TRAITS'], true);
+            if (is_array($traits)) {
+               foreach ($traits as $trait) {
+                   if ($trait['linked_object'] == $object && $trait['linked_property']== $property)
+                   {
+                        $capabilities = [];
+                        $properties = [];
+                               //send new value
+                          if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
+                             $state['instance'] = str_replace('_sensor', '', $trait['type']);
+                          } else {
+                             $state['instance'] = $trait['type'];
+                          }
+                          switch ($trait['type']) {
+                              case 'on':
+                              case 'mute':
+                              case 'pause':
+                              case 'backlight':
+                              case 'keep_warm':
+                              case 'ionization':
+                              case 'oscillation':
+                              case 'controls_locked':
+                                 $state['value'] = $value ? true : false;
+                                 break;
+                              case 'amperage_sensor':
+                              case 'battery_level_sensor':
+                              case 'co2_level_sensor':
+                              case 'humidity_sensor':
+                              case 'illumination_sensor':
+                              case 'pm1_density_sensor':
+                              case 'pm2.5_density_sensor':
+                              case 'pm10_density_sensor':
+                              case 'power_sensor':
+                              case 'pressure_sensor':
+                              case 'temperature_sensor':
+                              case 'tvoc_sensor':
+                              case 'voltage_sensor':
+                              case 'water_level_sensor':
+                                 $state['value'] = floatval($value);
+                                 break;
+                              case 'vibration_sensor':
+                              case 'button_sensor':
+                              case 'motion_sensor':
+                              case 'smoke_sensor':
+                              case 'gas_sensor':
+                                 $state['value'] = $value ? 'detected' : 'not_detected';
+                                 break;
+                              case 'water_leak_sensor':
+                                 $state['value'] = $value ? 'leak' : 'dry';
+                                 break;
+                              case 'rgb':
+                                 $value = preg_replace('/^#/', '', $value);
+                                 $state['value'] = hexdec($value);
+                                 break;
+                              case 'open_sensor':
+                                 $state['value'] = (gg($trait['linked_object'].'.ncno') == 'nc' ? ($value ? 'closed' : 'opened') : ($value ? 'opened' : 'closed'));
+                                 break;
+                              case 'open':
+                              case 'volume':
+                              case 'channel':
+                              case 'humidity':
+                              case 'brightness':
+                              case 'temperature':
+                              case 'temperature_k':
+                                 $state['value'] = (int)$value;
+                                 break;
+                              default:
+                                 $state['value'] = $value;
+                                 break;
+                          }
+
+
+                          if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
+                             $properties[] = [
+                                'type' => PREFIX_PROPERTIES . $this->devices_instance[$trait['type']]['capability'],
+                                'state' => $state
+                             ];
+                          }
+                          else {
+                              //continue; // no send state for capabilities
+                             $capabilities[] = [
+                                'type' => PREFIX_CAPABILITIES . $this->devices_instance[$trait['type']]['capability'],
+                                'state' => $state
+                             ];
+                          }
+                       $dev[] =[
+                            "id" => $device["ID"],
+                            'capabilities' => $capabilities,
+                            'properties' => $properties
+                        ];
+                       $payload = array(
+                                "user_id" => md5($this->config['USER_NAME']),
+                                "devices" => $dev);
+                       $send = array(
+                                      'ts' => time(),
+                                      'payload' => $payload,
+                                    );
+                       $this->WriteLog("PropertySetHandle send: ".json_encode($send));
+                       $url = "https://dialogs.yandex.net/api/v1/skills/".$this->config['CLIENT_KEY']."/callback/state";
+                       $crl = curl_init($url);
+                       curl_setopt($crl, CURLOPT_URL, $url);
+                       curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+
+
+                       $headr = array();
+                       $headr[] = 'Content-type: application/json';
+                       $headr[] = 'Authorization: OAuth '.$this->config['SKILL_ACCESS_TOKEN'];
+
+                       curl_setopt($crl, CURLOPT_HTTPHEADER,$headr);
+                       curl_setopt($crl, CURLOPT_POST, 1);
+                       curl_setopt($crl, CURLOPT_POSTFIELDS, json_encode($send));
+
+                       $rest = curl_exec($crl);
+
+                       curl_close($crl);
+
+                       $this->WriteLog("PropertySetHandle send result: ".$rest);
+                   }
+                }
+            }
+      }
    }
 
    /**
@@ -584,7 +719,7 @@ class yandexhome extends module
       foreach ($res as $device) {
          $devices[] = json_decode($device['CONFIG']);
       }
-      
+
       $response = json_encode([
          'request_id' => $content['request_id'],
          'payload' => [
@@ -618,7 +753,7 @@ class yandexhome extends module
             $traits = json_decode($rec['TRAITS'], true);
             if (is_array($traits)) {
                foreach ($traits as $trait) {
-                  if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                  if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
                      $state['instance'] = str_replace('_sensor', '', $trait['type']);
                   } else {
                      $state['instance'] = $trait['type'];
@@ -644,18 +779,37 @@ class yandexhome extends module
                         $state['value'] = $value ? true : false;
                         break;
                      case 'amperage_sensor':
+                     case 'battery_level_sensor':
                      case 'co2_level_sensor':
                      case 'humidity_sensor':
+                     case 'illumination_sensor':
+                     case 'pm1_density_sensor':
+                     case 'pm2.5_density_sensor':
+                     case 'pm10_density_sensor':
                      case 'power_sensor':
+                     case 'pressure_sensor':
                      case 'temperature_sensor':
+                     case 'tvoc_sensor':
                      case 'voltage_sensor':
                      case 'water_level_sensor':
-                     case 'battery_level_sensor':
                         $state['value'] = floatval($value);
+                        break;
+                     case 'vibration_sensor':
+                     case 'button_sensor':
+                     case 'motion_sensor':
+                     case 'smoke_sensor':
+                     case 'gas_sensor':
+                        $state['value'] = $value ? 'detected' : 'not_detected';
+                        break;
+                     case 'water_leak_sensor':
+                        $state['value'] = $value ? 'leak' : 'dry';
                         break;
                      case 'rgb':
                         $value = preg_replace('/^#/', '', $value);
                         $state['value'] = hexdec($value);
+                        break;
+                     case 'open_sensor':
+                        $state['value'] = (gg($trait['linked_object'].'.ncno') == 'nc' ? ($value ? 'closed' : 'opened') : ($value ? 'opened' : 'closed'));
                         break;
                      case 'open':
                      case 'volume':
@@ -670,7 +824,7 @@ class yandexhome extends module
                         $state['value'] = $value;
                         break;
                   }
-                  if ($this->devices_instance[$trait['type']]['capability'] == 'float') {
+                  if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
                      $properties[] = [
                         'type' => PREFIX_PROPERTIES . $this->devices_instance[$trait['type']]['capability'],
                         'state' => $state
@@ -767,6 +921,21 @@ class yandexhome extends module
                      case 'controls_locked':
                         // Конвертируем true/false в 1/0.
                         $value = ($value === true) ? 1 : 0;
+                        break;
+                     case 'motion_sensor':
+                        $value = ($value == 'detected') ? 1 : 0;
+                        break;
+                     case 'smoke_sensor':
+                        $value = ($value == 'detected') ? 1 : 0;
+                        break;
+                     case 'gas_sensor':
+                        $value = ($value == 'detected') ? 1 : 0;
+                        break;
+                     case 'water_leak_sensor':
+                        $value = ($value == 'leak') ? 1 : 0;
+                        break;
+                     case 'open_sensor':
+                        $state['value'] = (gg($linked_object.'.ncno') == 'nc' ? ($value ? 'closed' : 'opened') : ($value ? 'opened' : 'closed'));
                         break;
                      case 'rgb':
                         $value = str_pad(dechex($value), 6, '0', STR_PAD_LEFT);
