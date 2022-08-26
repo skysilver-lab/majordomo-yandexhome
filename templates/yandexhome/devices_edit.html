@@ -190,7 +190,7 @@ script.onload = function() {
       var traits = tryParseJSON(traits_json);
       if (traits !== false) {
          traits_list = traits;
-         for (key in traits_list) {
+         for (key in traits_list) {		
             if (traits_list.hasOwnProperty(key)) {
                // Делаем неактивными пункты в списке выбора метрик.
                $('#select_trait').find('[value='+traits_list[key].type+']').prop('disabled', true);
@@ -236,6 +236,28 @@ script.onload = function() {
    //console.log('stop');
 }
 
+//Доделано SmoKE xD, я сам нихера не понимаю, что тут написано, но работает!
+function addReportable(prop_name) {
+	traits = tryParseJSON($('#traits_json').val());
+
+	//Чекаем есть или нет в масссиве
+	//if(typeof traits[prop_name]['reportable'] === 'undefined') {
+		if(!traits[prop_name]['reportable']) {
+			traits[prop_name]['reportable'] = true;
+			//Красим кнопку
+			$('.reportableBtn#'+prop_name+'>i').attr('style', 'color:green;');
+		} else {
+			traits[prop_name]['reportable'] = false;
+			//Красим кнопку
+			$('.reportableBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
+		}
+	//}
+		
+	
+	//Запишем обратно в поле
+	$('#traits_json').val(JSON.stringify(traits));
+}
+
 function renderTraitsTable() {
    $('#traits_table tr').remove();
    isPopover = false;
@@ -245,8 +267,9 @@ function renderTraitsTable() {
          let linked_object = traits_list[key].linked_object;
          let linked_property = traits_list[key].linked_property;
          let linked_description = traits_list[key].description;
+         let reportable = traits_list[key].reportable;
          // Формируем строки в таблице метрик.
-         addTraitRow(linked_type, linked_description, linked_object, linked_property);
+         addTraitRow(linked_type, linked_description, linked_object, linked_property, reportable);
          objects_list[linked_object] = '';
       }
    }
@@ -299,7 +322,7 @@ function renderObjectSelectbox(id, selected = '') {
    }
 }
 
-function addTraitRow(linked_type, linked_description, linked_object, linked_property) {
+function addTraitRow(linked_type, linked_description, linked_object, linked_property, reportable = false) {
    // Строка с наименование метрики.
    let row = $('<tr id="table_titlerow' + linked_type + '"/>');
    $('#traits_table').append(row);
@@ -331,8 +354,10 @@ function addTraitRow(linked_type, linked_description, linked_object, linked_prop
 
    renderPropertySelectbox('linked_property' + linked_type, linked_object, linked_property);
 
+	var reportable_color = (reportable) ? "color: green" : 'color: #959595;';
+
    // Кнопка удаления метрики.
-   row.append($(`<td><span id="${linked_type}" class="btn btn-link" onclick="deleteTrait($(this).attr(\'id\'));"><i class="glyphicon glyphicon-trash"></i></span></td>`));
+   row.append($(`<td style="display: flex"><span id="${linked_type}" class="btn btn-link" onclick="deleteTrait($(this).attr(\'id\'));"><i class="glyphicon glyphicon-trash"></i></span><span title="Система будет автоматически отправлять изменения в Яндекс. (Требуется настройка)" id="${linked_type}" class="btn btn-link reportableBtn" onclick="addReportable($(this).attr(\'id\'));"><i class="glyphicon glyphicon-retweet" style="${reportable_color}"></i></span></td>`));
 }
 
 function addTrait() {
@@ -347,6 +372,7 @@ function addTrait() {
       traits_list[trait_type].description = trait_description;
       traits_list[trait_type].linked_object = '';
       traits_list[trait_type].linked_property = '';
+      traits_list[trait_type].reportable = false;
       saveTraitsList();
 
       isPopover = false;
