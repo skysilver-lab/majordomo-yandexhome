@@ -412,6 +412,9 @@ class yandexhome extends module
                if (is_array($new_dev_traits)) {
                   foreach ($new_dev_traits as $trait) {
                      $parameters = [];
+					 
+					 //Отправка в Яндекс
+					 $trait['reportable'] = ($trait['reportable'] != null) ?? false;
 
                      if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
                         $trait_type = PREFIX_PROPERTIES . $this->devices_instance[$trait['type']]['capability'];
@@ -448,22 +451,26 @@ class yandexhome extends module
                         } else {
                            $retrievable = true;
                         }
+						
                         if (($this->devices_instance[$trait['type']]['capability'] == 'float') || ($this->devices_instance[$trait['type']]['capability'] == 'event')) {
                            $properties[] = [
                               'type' => $trait_type,
                               'parameters' => $parameters,
-                              'retrievable' => $retrievable
+                              'retrievable' => $retrievable,
+                              'reportable' => $trait['reportable']
                            ];
                         } else {
                            $traits[] = [
                               'type' => $trait_type,
                               'parameters' => $parameters,
-                              'retrievable' => $retrievable
+                              'retrievable' => $retrievable,
+                              'reportable' => $trait['reportable']
                            ];
                         }
                      }
                   }
                }
+
                $rec['CONFIG'] =  json_encode([
                                        'id' => $rec['ID'],
                                        'name' => $rec['TITLE'],
@@ -474,7 +481,7 @@ class yandexhome extends module
                                        'properties' => $properties,
                                        'device_info' => [
                                           'manufacturer' => $rec['MANUFACTURER'],
-                                          'model' => $rec['MODEL'] . ' via MajorDoMo',
+                                          'model' => $rec['MODEL'] . ' | MajorDoMo',
                                           'hw_version' => $rec['HW_VERSION'],
                                           'sw_version' => $rec['SW_VERSION']
                                        ]
