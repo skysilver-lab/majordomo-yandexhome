@@ -253,7 +253,8 @@ $this->devices_instance = [
             ['value' => 'cool'],
             ['value' => 'eco'],
             ['value' => 'dry'],
-            ['value' => 'fan_only']
+            ['value' => 'fan_only'],
+            ['value' => 'turbo'],
          ],
          'ordered' => true
       ]
