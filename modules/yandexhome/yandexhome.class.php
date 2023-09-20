@@ -690,6 +690,13 @@ class yandexhome extends module
                        $headr[] = 'Content-type: application/json';
                        $headr[] = 'Authorization: OAuth '.$this->config['SKILL_ACCESS_TOKEN'];
 
+                       if (defined('USE_PROXY') && USE_PROXY != '') {
+                        curl_setopt($crl, CURLOPT_PROXY, USE_PROXY);
+                        if (defined('USE_PROXY_AUTH') && USE_PROXY_AUTH != '') {
+                           curl_setopt($crl, CURLOPT_PROXYUSERPWD, USE_PROXY_AUTH);
+                        }
+                       }
+			   
                        curl_setopt($crl, CURLOPT_HTTPHEADER,$headr);
                        curl_setopt($crl, CURLOPT_POST, 1);
                        curl_setopt($crl, CURLOPT_POSTFIELDS, json_encode($send));
