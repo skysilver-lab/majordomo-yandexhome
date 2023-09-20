@@ -623,7 +623,7 @@ class yandexhome extends module
                                  $state['value'] = floatval($value);
                                  break;
                               case 'vibration_sensor':
-                              case 'button_sensor':
+                              //case 'button_sensor':
                               case 'motion_sensor':
                               case 'smoke_sensor':
                               case 'gas_sensor':
@@ -795,7 +795,7 @@ class yandexhome extends module
                         $state['value'] = floatval($value);
                         break;
                      case 'vibration_sensor':
-                     case 'button_sensor':
+                     //case 'button_sensor':
                      case 'motion_sensor':
                      case 'smoke_sensor':
                      case 'gas_sensor':
