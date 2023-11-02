@@ -106,7 +106,10 @@ $this->devices_instance = [
       'instance_name' => 'on',
       'description' => 'Включить/выключить',
       'capability' => 'on_off',
-      'default_value' => 0
+      'default_value' => 0,
+      'parameters' => [
+         'split' => false,
+      ]
    ],
    'humidity' => [
       'instance_name' => 'humidity',
