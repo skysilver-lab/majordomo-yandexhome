@@ -190,7 +190,7 @@ script.onload = function() {
       var traits = tryParseJSON(traits_json);
       if (traits !== false) {
          traits_list = traits;
-         for (key in traits_list) {		
+         for (key in traits_list) {
             if (traits_list.hasOwnProperty(key)) {
                // Делаем неактивными пункты в списке выбора метрик.
                $('#select_trait').find('[value='+traits_list[key].type+']').prop('disabled', true);
@@ -220,6 +220,12 @@ script.onload = function() {
                      instance_list[linked_type].parameters.range['precision'] = precision_value;
                   }
                }
+               if (instance_list[linked_type].capability === 'on_off') {
+                  if (typeof(capabilities[key].parameters['split']) != 'undefined' && capabilities[key].parameters['split'] !== null) {
+                     split = capabilities[key].parameters['split'];
+                     instance_list[linked_type].parameters['split'] = split;
+                  }
+               }
             }
          }
          saveInstanceList();
@@ -237,25 +243,50 @@ script.onload = function() {
 }
 
 //Доделано SmoKE xD, я сам нихера не понимаю, что тут написано, но работает!
-function addReportable(prop_name) {
-	traits = tryParseJSON($('#traits_json').val());
+//London тоже руку приложил, тож нихера не понял
 
-	//Чекаем есть или нет в масссиве
-	//if(typeof traits[prop_name]['reportable'] === 'undefined') {
-		if(!traits[prop_name]['reportable']) {
-			traits[prop_name]['reportable'] = true;
-			//Красим кнопку
-			$('.reportableBtn#'+prop_name+'>i').attr('style', 'color:green;');
-		} else {
-			traits[prop_name]['reportable'] = false;
-			//Красим кнопку
-			$('.reportableBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
-		}
-	//}
-		
-	
-	//Запишем обратно в поле
-	$('#traits_json').val(JSON.stringify(traits));
+function addReportable(prop_name,split = false) {
+        traits = tryParseJSON($('#traits_json').val());
+        if (prop_name == 'on') {
+          instance = tryParseJSON($('#instance_json').val());
+        }
+        if (!split) {
+                if(!traits[prop_name]['reportable']) {
+                        traits[prop_name]['reportable'] = true;
+                        //Красим кнопку
+                        $('.reportableBtn#'+prop_name+'>i').attr('style', 'color:green;');
+                        if (prop_name == 'on') {
+                          if(instance[prop_name]['parameters']['split']) {
+                            instance[prop_name]['parameters']['split'] = false;
+                            $('.splitBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
+                          }
+                        }
+                } else {
+                        traits[prop_name]['reportable'] = false;
+                        //Красим кнопку
+                        $('.reportableBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
+                }
+        } else {
+                if(!instance[prop_name]['parameters']['split']) {
+                        instance[prop_name]['parameters']['split'] = true;
+                        //Красим кнопку
+                        $('.splitBtn#'+prop_name+'>i').attr('style', 'color:green;');
+                        if (traits[prop_name]['reportable']) {
+                          traits[prop_name]['reportable'] = false;
+                          $('.reportableBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
+                        }
+                } else {
+                        instance[prop_name]['parameters']['split'] = false;
+                        //Красим кнопку
+                        $('.splitBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
+                }
+
+        }
+        //Запишем обратно в поле
+        $('#traits_json').val(JSON.stringify(traits));
+        if (prop_name == 'on') {
+          $('#instance_json').val(JSON.stringify(instance));
+        }
 }
 
 function renderTraitsTable() {
@@ -268,8 +299,25 @@ function renderTraitsTable() {
          let linked_property = traits_list[key].linked_property;
          let linked_description = traits_list[key].description;
          let reportable = traits_list[key].reportable;
+         let split = false;
+         if (key == 'on') {
+           let capabilities = dev_config.capabilities;
+           if (capabilities.length > 0) {
+             for (key2 in capabilities) {
+                if (typeof(capabilities[key2].parameters.instance) != 'undefined' && capabilities[key2].parameters.instance !== null) {
+                   let linked_type = capabilities[key2].parameters.instance;
+                   if (instance_list[linked_type].capability === 'on_off') {
+                      if (typeof(capabilities[key2].parameters['split']) != 'undefined' && capabilities[key2].parameters['split'] !== null) {
+                         split = capabilities[key2].parameters['split'];
+                         instance_list[linked_type].parameters['split'] = split;
+                      }
+                   }
+                }
+             }
+           }
+         }
          // Формируем строки в таблице метрик.
-         addTraitRow(linked_type, linked_description, linked_object, linked_property, reportable);
+         addTraitRow(linked_type, linked_description, linked_object, linked_property, reportable, split);
          objects_list[linked_object] = '';
       }
    }
@@ -322,7 +370,7 @@ function renderObjectSelectbox(id, selected = '') {
    }
 }
 
-function addTraitRow(linked_type, linked_description, linked_object, linked_property, reportable = false) {
+function addTraitRow(linked_type, linked_description, linked_object, linked_property, reportable = false, split = false) {
    // Строка с наименование метрики.
    let row = $('<tr id="table_titlerow' + linked_type + '"/>');
    $('#traits_table').append(row);
@@ -354,10 +402,21 @@ function addTraitRow(linked_type, linked_description, linked_object, linked_prop
 
    renderPropertySelectbox('linked_property' + linked_type, linked_object, linked_property);
 
-	var reportable_color = (reportable) ? "color: green" : 'color: #959595;';
+   var reportable_color = (reportable) ? "color: green" : 'color: #959595;';
+
+   let split_options = '';
+   if (instance_list[linked_type].capability === 'on_off') {
+//console.log(split);
+      if (typeof(instance_list[linked_type].parameters) != 'undefined' && instance_list[linked_type].parameters !== null) {
+         var split_color = (split) ? "color: green" : 'color: #959595;';
+         split_options =
+         `<span title="Разделение кнопки на 2 отдельные Вкл/Выкл (доступно только при выключенном Reportable)" id="${linked_type}" class="btn btn-link splitBtn" onclick="addReportable($(this).attr(\'id\'),true);"><i class="glyphicon glyphicon-sound-stereo" style="${split_color}"></i></span>`;
+      }
+   }
+
 
    // Кнопка удаления метрики.
-   row.append($(`<td style="display: flex"><span id="${linked_type}" class="btn btn-link" onclick="deleteTrait($(this).attr(\'id\'));"><i class="glyphicon glyphicon-trash"></i></span>[#if SKILL_ACCESS_TOKEN != ''#]<span title="Система будет автоматически отправлять изменения в Яндекс. (Требуется настройка)" id="${linked_type}" class="btn btn-link reportableBtn" onclick="addReportable($(this).attr(\'id\'));"><i class="glyphicon glyphicon-retweet" style="${reportable_color}"></i></span>[#endif#]</td>`)); 
+   row.append($(`<td style="display: flex"><span id="${linked_type}" class="btn btn-link" onclick="deleteTrait($(this).attr(\'id\'));"><i class="glyphicon glyphicon-trash"></i></span>[#if SKILL_ACCESS_TOKEN != ''#]<span title="Система будет автоматически отправлять изменения в Яндекс. (Требуется настройка)" id="${linked_type}" class="btn btn-link reportableBtn" onclick="addReportable($(this).attr(\'id\'));"><i class="glyphicon glyphicon-retweet" style="${reportable_color}"></i></span>[#endif#]${split_options}</td>`));
 }
 
 function addTrait() {
