@@ -4,6 +4,7 @@ chdir (dirname (__FILE__) . '/../../');
 
 include_once ('./config.php');
 include_once ('./lib/loader.php');
+include_once ('./load_settings.php');
 
 $timezone = SQLSelectOne('SELECT NAME, VALUE FROM settings WHERE NAME="SITE_TIMEZONE"')['VALUE'];
 

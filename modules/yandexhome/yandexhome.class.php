@@ -268,6 +268,7 @@ class yandexhome extends module
             }
             $traits = json_decode($res[$i]['TRAITS'], true);
             if (is_array($traits) && count($traits) > 0) {
+               $res[$i]['TRAITS_LIST'] = "";
                foreach ($traits as $trait) {
                   $res[$i]['TRAITS_LIST'] .= $trait['type'] . '<br>';
                }
