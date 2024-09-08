@@ -3,7 +3,7 @@
    <!--# Верхняя строка с кнопоками 'Настройки', 'Добавить', 'Синхронизировать', 'Справка', 'О модуле'. #-->
    <div>
       <!--# Логотип. #-->
-      <img src="../img/modules/yandexhome.png"  width="30" height="30">
+      <img src="<#ROOTHTML#>img/modules/yandexhome.png"  width="30" height="30">
       &nbsp;&nbsp;&nbsp;
       <!--# Кнопка 'Настройки'. #-->
       <a class="btn btn-default" href="#api_settings" data-toggle="collapse"><i class="glyphicon glyphicon-cog"></i> Настройки</a>
@@ -13,7 +13,7 @@
       &nbsp;&nbsp;&nbsp;
       <!--# Ссылка на Яндекс Диалоги. #-->
       <a href="https://dialogs.yandex.ru/developer/skills/" title="Перейти в Яндекс Диалоги" target="_blank">
-         <img src="../templates/yandexhome/img/dialog_logo.png"  width="30" height="30">
+         <img src="<#ROOTHTML#>templates/yandexhome/img/dialog_logo.png"  width="30" height="30">
       </a>
       &nbsp;&nbsp;&nbsp;
       <!--# Кнопка 'Синхронизировать'. #-->
@@ -62,7 +62,7 @@
 
    function SendSynqRequest() {
 
-      var url = '/ajax/yandexhome.html?op=SendSynqRequest';
+      var url = ROOTHTML+'ajax/yandexhome.html?op=SendSynqRequest';
 
       $.ajax({
          url: url,

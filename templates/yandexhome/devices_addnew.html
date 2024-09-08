@@ -1,5 +1,5 @@
 ﻿<!--# Интерфейс ручного добавления устройства. #-->
-<link rel="stylesheet" href="../templates/yandexhome/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="<#ROOTHTML#>templates/yandexhome/css/bootstrap-select.min.css">
 <legend>Новое устройство</legend>
 <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
    <fieldset>
@@ -22,7 +22,7 @@
          <div class="col-lg-4">
             <select name="type" class="selectpicker show-tick form-control">
             [#begin DEVICES_TYPE#]
-               <option data-content="<img src='../templates/yandexhome/img/[#device_name#].svg' width='20' height='20'>&nbsp;&nbsp;[#description#]" value="[#device_name#]"></option>
+               <option data-content="<img src='<#ROOTHTML#>templates/yandexhome/img/[#device_name#].svg' width='20' height='20'>&nbsp;&nbsp;[#description#]" value="[#device_name#]"></option>
             [#end DEVICES_TYPE#]
             </select>
          </div>
@@ -52,7 +52,7 @@
 <script type="text/javascript">
 
 var script = document.createElement('script');
-script.src = "../templates/yandexhome/css/bootstrap-select.min.js"
+script.src = "<#ROOTHTML#>templates/yandexhome/css/bootstrap-select.min.js"
 document.body.appendChild(script);
 
 script.onload = function() {
