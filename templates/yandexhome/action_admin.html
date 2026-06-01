@@ -10,6 +10,12 @@
       &nbsp;&nbsp;&nbsp;
       <!--# Кнопка 'Добавить'. #-->
       <a href="?view_mode=addnew_yandexhome_devices" class="btn btn-default" title="Добавить устройство"><i class="glyphicon glyphicon-plus"></i></a>
+      &nbsp;&nbsp;
+      <!--# Кнопка 'Создать фейковые устройства'. #-->
+      <a href="?view_mode=create_fake_devices" class="btn btn-default" title="Создать фейковые устройства для загрузки иконок в Яндекс" onClick="return confirm('Создать фейковые устройства по всем типам?')"><i class="glyphicon glyphicon-duplicate"></i> Фейки: создать</a>
+      &nbsp;&nbsp;
+      <!--# Кнопка 'Удалить фейковые устройства'. #-->
+      <a href="?view_mode=delete_fake_devices" class="btn btn-default" title="Удалить фейковые устройства" onClick="return confirm('Удалить все фейковые устройства, созданные для иконок?')"><i class="glyphicon glyphicon-trash"></i> Фейки: удалить</a>
       &nbsp;&nbsp;&nbsp;
       <!--# Ссылка на Яндекс Диалоги. #-->
       <a href="https://dialogs.yandex.ru/developer/skills/" title="Перейти в Яндекс Диалоги" target="_blank">
@@ -28,6 +34,13 @@
 
    <!--# Выпадающее меню настроек. #-->
    [#inc settings.html#]
+
+   [#if FAKE_CREATED!=""#]
+      <div class="alert alert-info" role="alert" style="margin-top:10px;">Создано фейковых устройств: <b>[#FAKE_CREATED#]</b></div>
+   [#endif#]
+   [#if FAKE_DELETED!=""#]
+      <div class="alert alert-info" role="alert" style="margin-top:10px;">Удалено фейковых устройств: <b>[#FAKE_DELETED#]</b></div>
+   [#endif#]
 
    <!--# Область со списком устройств. #-->
    [#if VIEW_STYLE="table" OR VIEW_STYLE="table_group"#]

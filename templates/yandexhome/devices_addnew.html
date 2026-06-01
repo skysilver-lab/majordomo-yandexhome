@@ -21,9 +21,20 @@
          <label class="col-lg-3 control-label"><#LANG_TYPE#> (*):</label>
          <div class="col-lg-4">
             <select name="type" class="selectpicker show-tick form-control">
+            <optgroup label="Освещение">
             [#begin DEVICES_TYPE#]
-               <option data-content="<img src='../templates/yandexhome/img/[#device_name#].svg' width='20' height='20'>&nbsp;&nbsp;[#description#]" value="[#device_name#]"></option>
+               [#if device_name=="socket"#]</optgroup><optgroup label="Электрика">[#endif#]
+               [#if device_name=="thermostat"#]</optgroup><optgroup label="Климат">[#endif#]
+               [#if device_name=="media_device"#]</optgroup><optgroup label="Медиа">[#endif#]
+               [#if device_name=="cooking"#]</optgroup><optgroup label="Техника">[#endif#]
+               [#if device_name=="openable"#]</optgroup><optgroup label="Открывание и доступ">[#endif#]
+               [#if device_name=="sensor"#]</optgroup><optgroup label="Датчики">[#endif#]
+               [#if device_name=="smart_meter"#]</optgroup><optgroup label="Счетчики">[#endif#]
+               [#if device_name=="pet_drinking_fountain"#]</optgroup><optgroup label="Питомцы">[#endif#]
+               [#if device_name=="other"#]</optgroup><optgroup label="Другое">[#endif#]
+               <option data-content="<img src='../templates/yandexhome/img/[#icon_webp_name#].webp' width='20' height='20' onerror='this.onerror=null;this.src=&quot;../templates/yandexhome/img/[#icon_name#].svg&quot;;this.onerror=function(){this.src=&quot;../img/modules/yandexhome.png&quot;;};'>&nbsp;&nbsp;[#description#]" value="[#device_name#]"></option>
             [#end DEVICES_TYPE#]
+            </optgroup>
             </select>
          </div>
       </div>

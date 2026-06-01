@@ -23,9 +23,20 @@
          <label class="col-lg-3 control-label"><#LANG_TYPE#> (*):</label>
          <div class="col-lg-4">
             <select name="type" id="select_device" class="selectpicker show-tick form-control">
+            <optgroup label="Освещение">
             [#begin DEVICES_TYPE#]
-            <option data-content="<img src='../templates/yandexhome/img/[#device_name#].svg' width='20' height='20'>&nbsp;&nbsp;[#description#]" value="[#device_name#]" [#if device_name="<#TYPE#>"#] selected[#endif#]></option>
+            [#if device_name=="socket"#]</optgroup><optgroup label="Электрика">[#endif#]
+            [#if device_name=="thermostat"#]</optgroup><optgroup label="Климат">[#endif#]
+            [#if device_name=="media_device"#]</optgroup><optgroup label="Медиа">[#endif#]
+            [#if device_name=="cooking"#]</optgroup><optgroup label="Техника">[#endif#]
+            [#if device_name=="openable"#]</optgroup><optgroup label="Открывание и доступ">[#endif#]
+            [#if device_name=="sensor"#]</optgroup><optgroup label="Датчики">[#endif#]
+            [#if device_name=="smart_meter"#]</optgroup><optgroup label="Счетчики">[#endif#]
+            [#if device_name=="pet_drinking_fountain"#]</optgroup><optgroup label="Питомцы">[#endif#]
+            [#if device_name=="other"#]</optgroup><optgroup label="Другое">[#endif#]
+            <option data-content="<img src='../templates/yandexhome/img/[#icon_webp_name#].webp' width='20' height='20' onerror='this.onerror=null;this.src=&quot;../templates/yandexhome/img/[#icon_name#].svg&quot;;this.onerror=function(){this.src=&quot;../img/modules/yandexhome.png&quot;;};'>&nbsp;&nbsp;[#description#]" value="[#device_name#]" [#if device_name="<#TYPE#>"#] selected[#endif#]></option>
             [#end DEVICES_TYPE#]
+            </optgroup>
             </select>
          </div>
       </div>
@@ -85,17 +96,16 @@
             <div class="input-group">
                <select id="select_trait" class="selectpicker form-control" title="Ничего не выбрано...">
                   <option data-content="" value=""></option>
-                  <optgroup label="Умения">
+                  <optgroup label="Управление: Вкл/Выкл">
                   [#begin DEVICES_INSTANCE#]
-                  <option data-content="[#description#] ([#instance_name#])" description="[#description#]" value="[#instance_name#]"></option>
-                  [#if instance_name=="brightness"#]
-                  </optgroup>
-                  <optgroup label="Датчики числовые">
-                  [#endif#]
-                  [#if instance_name=="water_level_sensor"#]
-                  </optgroup>
-                  <optgroup label="Датчики логические">
-                  [#endif#]
+                  [#if instance_name=="backlight"#]</optgroup><optgroup label="Управление: Переключатели (toggle)">[#endif#]
+                  [#if instance_name=="brightness"#]</optgroup><optgroup label="Управление: Диапазоны (range)">[#endif#]
+                  [#if instance_name=="cleanup_mode"#]</optgroup><optgroup label="Управление: Режимы (mode)">[#endif#]
+                  [#if instance_name=="rgb"#]</optgroup><optgroup label="Управление: Цвет (color_setting)">[#endif#]
+                  [#if instance_name=="video_stream"#]</optgroup><optgroup label="Камера: Видеопоток">[#endif#]
+                  [#if instance_name=="amperage_sensor"#]</optgroup><optgroup label="Датчики: Числовые (float)">[#endif#]
+                  [#if instance_name=="vibration_sensor"#]</optgroup><optgroup label="Датчики: События (event)">[#endif#]
+                  <option data-content="[#description#] ([#instance_name#] / [#capability#])" description="[#description#]" value="[#instance_name#]"></option>
                   [#end DEVICES_INSTANCE#]
                   </optgroup>
                </select>
@@ -108,7 +118,7 @@
       <div class="form-group">
          <label class="col-lg-3 control-label"></label>
          <div class="col-lg-4">
-            <table id="traits_table" class="table"></table>
+            <div id="traits_table" class="yh-traits-list"></div>
             <input type="hidden" name="traits_json" id="traits_json" value="{}">
             <input type="hidden" name="instance_json" id="instance_json" value="{}">
          </div>
@@ -127,6 +137,7 @@
 
 <div>
    <pre id="objects_json" style="display:none;">[#OBJECTS#]</pre>
+   <pre id="value_map_presets_json" style="display:none;">[#VALUE_MAP_PRESETS_JSON#]</pre>
    <!--# <pre>[#CONFIG#]</pre> #-->
    <!--# <pre>[#TRAITS#]</pre> #-->
 </div>
@@ -150,18 +161,36 @@ var traits_list = {};
 var objects_list = [];
 var objects_options = '';
 var instance_list = {};
+var value_map_presets = {};
 
 var isPopover = false;
+
+function asBool(value) {
+   if (typeof value === 'boolean') return value;
+   if (typeof value === 'number') return value !== 0;
+   if (typeof value === 'string') {
+      let v = value.toLowerCase().trim();
+      return (v === '1' || v === 'true' || v === 'yes' || v === 'on');
+   }
+   return !!value;
+}
 
 // Получаем список метрик в формате JSON.
 var traits_json = '[#TRAITS#]';
 
 // Получаем список метрик в формате JSON.
 var objects_json = $('#objects_json').text();
+var value_map_presets_json = $('#value_map_presets_json').text();
 
 // Получаем массив поддерживаемых умений.
 var instance_list = tryParseJSON('[#DEVICES_INSTANCE_JSON#]');
 saveInstanceList();
+if (value_map_presets_json !== '') {
+   let parsed_presets = tryParseJSON(value_map_presets_json);
+   if (parsed_presets !== false) {
+      value_map_presets = parsed_presets;
+   }
+}
 
 // Получаем конфиг устройства в формате JSON.
 var dev_config = tryParseJSON('[#CONFIG#]');
@@ -190,14 +219,21 @@ script.onload = function() {
       var traits = tryParseJSON(traits_json);
       if (traits !== false) {
          traits_list = traits;
-         for (key in traits_list) {
-            if (traits_list.hasOwnProperty(key)) {
-               // Делаем неактивными пункты в списке выбора метрик.
-               $('#select_trait').find('[value='+traits_list[key].type+']').prop('disabled', true);
+        for (const traitKey in traits_list) {
+            if (!traits_list.hasOwnProperty(traitKey)) continue;
+            if (typeof(traits_list[traitKey].value_map_preset) === 'undefined') {
+               traits_list[traitKey].value_map_preset = (traits_list[traitKey].type === 'on') ? 'bool_onoff_10' : 'none';
             }
+            if (typeof(traits_list[traitKey].value_map) === 'undefined' || traits_list[traitKey].value_map === null) {
+               if (traits_list[traitKey].type === 'on') {
+                  traits_list[traitKey].value_map = {'1':'on','0':'off','true':'on','false':'off'};
+               } else {
+                  traits_list[traitKey].value_map = {};
+               }
+            }
+            traits_list[traitKey].reportable = asBool(traits_list[traitKey].reportable);
          }
-         // Обновляем список выбора метрик.
-         $('#select_trait').selectpicker('refresh');
+         refreshTraitsSelectDisabled();
          // Формируем и выводим таблицу метрик.
          renderTraitsTable();
          saveTraitsList();
@@ -205,10 +241,10 @@ script.onload = function() {
    }
 
    if (dev_config !== '' && dev_config !== false) {
-      let capabilities = dev_config.capabilities;
+      let capabilities = (dev_config && dev_config.capabilities) ? dev_config.capabilities : [];
       if (capabilities.length > 0) {
          for (key in capabilities) {
-            if (typeof(capabilities[key].parameters.instance) != 'undefined' && capabilities[key].parameters.instance !== null) {
+            if (typeof(capabilities[key].parameters) != 'undefined' && typeof(capabilities[key].parameters.instance) != 'undefined' && capabilities[key].parameters.instance !== null && typeof(instance_list[capabilities[key].parameters.instance]) != 'undefined') {
                let linked_type = capabilities[key].parameters.instance;
                if (instance_list[linked_type].capability === 'range') {
                   if (typeof(capabilities[key].parameters.range) != 'undefined' && capabilities[key].parameters.range !== null) {
@@ -246,51 +282,34 @@ script.onload = function() {
 //London тоже руку приложил, тож нихера не понял
 
 function addReportable(prop_name,split = false) {
-        traits = tryParseJSON($('#traits_json').val());
-        if (prop_name == 'on') {
-          instance = tryParseJSON($('#instance_json').val());
-        }
-        if (!split) {
-                if(!traits[prop_name]['reportable']) {
-                        traits[prop_name]['reportable'] = true;
-                        //Красим кнопку
-                        $('.reportableBtn#'+prop_name+'>i').attr('style', 'color:green;');
-                        if (prop_name == 'on') {
-                          if(instance[prop_name]['parameters']['split']) {
-                            instance[prop_name]['parameters']['split'] = false;
-                            $('.splitBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
-                          }
-                        }
-                } else {
-                        traits[prop_name]['reportable'] = false;
-                        //Красим кнопку
-                        $('.reportableBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
-                }
-        } else {
-                if(!instance[prop_name]['parameters']['split']) {
-                        instance[prop_name]['parameters']['split'] = true;
-                        //Красим кнопку
-                        $('.splitBtn#'+prop_name+'>i').attr('style', 'color:green;');
-                        if (traits[prop_name]['reportable']) {
-                          traits[prop_name]['reportable'] = false;
-                          $('.reportableBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
-                        }
-                } else {
-                        instance[prop_name]['parameters']['split'] = false;
-                        //Красим кнопку
-                        $('.splitBtn#'+prop_name+'>i').attr('style', 'color: #959595;');
-                }
-
-        }
-        //Запишем обратно в поле
-        $('#traits_json').val(JSON.stringify(traits));
-        if (prop_name == 'on') {
-          $('#instance_json').val(JSON.stringify(instance));
-        }
+   let traits = traits_list;
+   if (typeof(traits[prop_name]) === 'undefined') {
+      return;
+   }
+   let instance = instance_list;
+   if (!split) {
+      traits[prop_name]['reportable'] = !asBool(traits[prop_name]['reportable']);
+      if (prop_name == 'on' && traits[prop_name]['reportable'] && instance[prop_name] && instance[prop_name]['parameters'] && instance[prop_name]['parameters']['split']) {
+         instance[prop_name]['parameters']['split'] = false;
+      }
+   } else if (prop_name == 'on') {
+      if (!instance[prop_name] || !instance[prop_name]['parameters']) {
+         return;
+      }
+      instance[prop_name]['parameters']['split'] = !asBool(instance[prop_name]['parameters']['split']);
+      if (instance[prop_name]['parameters']['split'] && asBool(traits[prop_name]['reportable'])) {
+         traits[prop_name]['reportable'] = false;
+      }
+   }
+   traits_list = traits;
+   instance_list = instance;
+   saveTraitsList();
+   saveInstanceList();
+   renderTraitsTable();
 }
 
 function renderTraitsTable() {
-   $('#traits_table tr').remove();
+   $('#traits_table').empty();
    isPopover = false;
    for (key in traits_list) {
       if (traits_list.hasOwnProperty(key)) {
@@ -298,13 +317,13 @@ function renderTraitsTable() {
          let linked_object = traits_list[key].linked_object;
          let linked_property = traits_list[key].linked_property;
          let linked_description = traits_list[key].description;
-         let reportable = traits_list[key].reportable;
+         let reportable = asBool(traits_list[key].reportable);
          let split = false;
          if (key == 'on') {
-           let capabilities = dev_config.capabilities;
+           let capabilities = (dev_config && dev_config.capabilities) ? dev_config.capabilities : [];
            if (capabilities.length > 0) {
              for (key2 in capabilities) {
-                if (typeof(capabilities[key2].parameters.instance) != 'undefined' && capabilities[key2].parameters.instance !== null) {
+                if (typeof(capabilities[key2].parameters) != 'undefined' && typeof(capabilities[key2].parameters.instance) != 'undefined' && capabilities[key2].parameters.instance !== null && typeof(instance_list[capabilities[key2].parameters.instance]) != 'undefined') {
                    let linked_type = capabilities[key2].parameters.instance;
                    if (instance_list[linked_type].capability === 'on_off') {
                       if (typeof(capabilities[key2].parameters['split']) != 'undefined' && capabilities[key2].parameters['split'] !== null) {
@@ -370,10 +389,210 @@ function renderObjectSelectbox(id, selected = '') {
    }
 }
 
+function refreshTraitsSelectDisabled() {
+   $('#select_trait option').prop('disabled', false);
+   for (key in traits_list) {
+      if (traits_list.hasOwnProperty(key)) {
+         $('#select_trait').find('[value=' + traits_list[key].type + ']').prop('disabled', true);
+      }
+   }
+   $('#select_trait').selectpicker('refresh');
+}
+
+function getTraitTypeOptionsHtml(current_type) {
+   let html = '<option value=""></option>';
+   $('#select_trait option').each(function() {
+      let value = $(this).val();
+      if (!value) {
+         return;
+      }
+      let description = $(this).attr('description') || $(this).text() || value;
+      let selected = (value === current_type) ? ' selected' : '';
+      let disabled = (value !== current_type && typeof(traits_list[value]) !== 'undefined') ? ' disabled' : '';
+      html += '<option value="' + value + '"' + selected + disabled + '>' + description + ' (' + value + ')</option>';
+   });
+   return html;
+}
+
+function getValueMapPresetOptionsHtml(current_preset) {
+   let html = '';
+   for (const preset_id in value_map_presets) {
+      if (!value_map_presets.hasOwnProperty(preset_id)) continue;
+      let label = value_map_presets[preset_id].label || preset_id;
+      let selected = (preset_id === current_preset) ? ' selected' : '';
+      html += '<option value="' + preset_id + '"' + selected + '>' + label + '</option>';
+   }
+   return html;
+}
+
+function getAllowedYandexValues(trait_type) {
+   let def = instance_list[trait_type];
+   if (def && typeof(def) === 'object') {
+      if (def.capability === 'mode' && def.parameters && Array.isArray(def.parameters.modes)) {
+         let modeValues = [];
+         for (let i = 0; i < def.parameters.modes.length; i++) {
+            let item = def.parameters.modes[i];
+            if (item && typeof(item.value) !== 'undefined') {
+               modeValues.push(String(item.value));
+            }
+         }
+         if (modeValues.length > 0) return modeValues;
+      }
+
+      if (def.capability === 'event' && def.parameters && Array.isArray(def.parameters.events)) {
+         let eventValues = [];
+         for (let i = 0; i < def.parameters.events.length; i++) {
+            let item = def.parameters.events[i];
+            if (item && typeof(item.value) !== 'undefined') {
+               eventValues.push(String(item.value));
+            }
+         }
+         if (eventValues.length > 0) return eventValues;
+      }
+
+      if (def.capability === 'toggle' || def.capability === 'on_off') {
+         return ['true', 'false', 'on', 'off', '1', '0'];
+      }
+   }
+
+   // Fallback for traits without explicit enum list in structure.
+   return ['opened', 'closed', 'detected', 'not_detected', 'leak', 'dry', 'click', 'double_click', 'long_press', 'low', 'normal', 'empty', 'on', 'off', 'true', 'false'];
+}
+
+function getYandexValueOptionsHtml(trait_type, selected_value) {
+   let values = getAllowedYandexValues(trait_type);
+   let html = '<option value=""></option>';
+   for (let i = 0; i < values.length; i++) {
+      let val = values[i];
+      let selected = (val === selected_value) ? ' selected' : '';
+      html += '<option value="' + val + '"' + selected + '>' + val + '</option>';
+   }
+   return html;
+}
+
+function renderValueMapEditor(trait_type) {
+   let container = $('#value_map_editor_' + trait_type);
+   container.empty();
+   if (typeof(traits_list[trait_type]) === 'undefined') return;
+   let editorField = container.closest('.yh-trait-map-editor-field');
+   if (traits_list[trait_type].value_map_preset !== 'custom') {
+      editorField.hide();
+      return;
+   }
+   editorField.show();
+
+   if (!traits_list[trait_type].value_map || typeof(traits_list[trait_type].value_map) !== 'object') {
+      traits_list[trait_type].value_map = {};
+   }
+
+   let map = traits_list[trait_type].value_map;
+   let keys = Object.keys(map);
+
+   let header = $('<div class="yh-map-header"><div>MJDM</div><div>Yandex</div><div></div></div>');
+   container.append(header);
+
+   for (let i = 0; i < keys.length; i++) {
+      let src = keys[i];
+      let dst = map[src];
+      let row = $('<div class="yh-map-row"></div>');
+      row.append('<input type="text" class="form-control input-sm yh-map-src" value="' + escapeHtml(src) + '" data-old-key="' + escapeHtml(src) + '">');
+      row.append('<select class="selectpicker yh-map-dst" data-width="100%">' + getYandexValueOptionsHtml(trait_type, dst) + '</select>');
+      row.append('<button type="button" class="btn btn-xs btn-default yh-map-del"><i class="glyphicon glyphicon-trash"></i></button>');
+      container.append(row);
+   }
+
+   let addBtn = $('<button type="button" class="btn btn-xs btn-default yh-map-add"><i class="glyphicon glyphicon-plus"></i>&nbsp;Добавить соответствие</button>');
+   container.append(addBtn);
+   container.find('.selectpicker').selectpicker('render').selectpicker('refresh');
+
+   container.find('.yh-map-add').off('click').on('click', function() {
+      let row = $('<div class="yh-map-row"></div>');
+      row.append('<input type="text" class="form-control input-sm yh-map-src" value="" data-old-key="">');
+      row.append('<select class="selectpicker yh-map-dst" data-width="100%">' + getYandexValueOptionsHtml(trait_type, '') + '</select>');
+      row.append('<button type="button" class="btn btn-xs btn-default yh-map-del"><i class="glyphicon glyphicon-trash"></i></button>');
+      $(this).before(row);
+      row.find('.selectpicker').selectpicker('render').selectpicker('refresh');
+   });
+
+   container.off('click', '.yh-map-del').on('click', '.yh-map-del', function() {
+      $(this).closest('.yh-map-row').remove();
+      collectValueMapFromEditor(trait_type);
+   });
+
+   container.off('change', '.yh-map-dst').on('change', '.yh-map-dst', function() {
+      collectValueMapFromEditor(trait_type);
+   });
+
+   container.off('change', '.yh-map-src').on('change', '.yh-map-src', function() {
+      collectValueMapFromEditor(trait_type);
+   });
+}
+
+function collectValueMapFromEditor(trait_type) {
+   let container = $('#value_map_editor_' + trait_type);
+   if (typeof(traits_list[trait_type]) === 'undefined') return;
+   let map = {};
+   container.find('.yh-map-row').each(function() {
+      let src = ($(this).find('.yh-map-src').val() || '').toString().trim().toLowerCase();
+      let dst = ($(this).find('.yh-map-dst').val() || '').toString().trim();
+      if (src !== '' && dst !== '') {
+         map[src] = dst;
+      }
+   });
+   traits_list[trait_type].value_map = map;
+   saveTraitsList();
+}
+
+function changeTraitValueMapPreset(trait_type, preset_id) {
+   if (typeof(traits_list[trait_type]) === 'undefined') {
+      return;
+   }
+   if (typeof(value_map_presets[preset_id]) === 'undefined') {
+      preset_id = 'none';
+   }
+
+   traits_list[trait_type].value_map_preset = preset_id;
+   if (preset_id !== 'custom') {
+      let preset_map = value_map_presets[preset_id] && value_map_presets[preset_id].map ? value_map_presets[preset_id].map : {};
+      let normalized_map = {};
+      for (const src in preset_map) {
+         if (!preset_map.hasOwnProperty(src)) continue;
+         normalized_map[String(src).toLowerCase()] = preset_map[src];
+      }
+      traits_list[trait_type].value_map = normalized_map;
+   }
+   saveTraitsList();
+   renderValueMapEditor(trait_type);
+}
+
+function changeTraitType(old_type, new_type) {
+   if (!new_type || old_type === new_type) {
+      return;
+   }
+   if (typeof(traits_list[old_type]) === 'undefined') {
+      return;
+   }
+   if (typeof(traits_list[new_type]) !== 'undefined') {
+      alert('Этот тип уже добавлен');
+      $('[id="trait_type_select_' + old_type + '"]').selectpicker('val', old_type);
+      return;
+   }
+
+   let new_description = $('#select_trait option[value="' + new_type + '"]').attr('description') || new_type;
+   let old_trait = traits_list[old_type];
+   old_trait.type = new_type;
+   old_trait.description = new_description;
+   delete(traits_list[old_type]);
+   traits_list[new_type] = old_trait;
+
+   saveTraitsList();
+   renderTraitsTable();
+   refreshTraitsSelectDisabled();
+}
+
 function addTraitRow(linked_type, linked_description, linked_object, linked_property, reportable = false, split = false) {
-   // Строка с наименование метрики.
-   let row = $('<tr id="table_titlerow' + linked_type + '"/>');
-   $('#traits_table').append(row);
+   let card = $('<div id="trait_card_' + linked_type + '" class="yh-trait-card"></div>');
+   $('#traits_table').append(card);
 
    let range_options = '';
 
@@ -385,38 +604,73 @@ function addTraitRow(linked_type, linked_description, linked_object, linked_prop
       }
    }
 
-   row.append($(`<td colspan="3">${linked_description} (${linked_type}) ${range_options}</td>`));
+   let trait_type_options = getTraitTypeOptionsHtml(linked_type);
+   let current_map_preset = (traits_list[linked_type] && traits_list[linked_type].value_map_preset) ? traits_list[linked_type].value_map_preset : 'none';
+   let map_preset_options = getValueMapPresetOptionsHtml(current_map_preset);
 
-   // Строка с полями выбора объекта и свойства.
-   row = $('<tr id="table_mainrow' + linked_type + '"/>');
-   $('#traits_table').append(row);
-   row.append($(`<td><input type="hidden" class="form-control" name="trait_type" value="${linked_type}"></td>`));
+   card.append($(`
+      <div class="yh-trait-card-head">
+         <div class="yh-trait-head-wrap">
+            <div class="yh-trait-head-title">${linked_description}</div>
+            <div class="yh-trait-head-controls">
+               <select id="trait_type_select_${linked_type}" class="selectpicker yh-trait-type-select" data-width="340px" data-live-search="true" onchange="changeTraitType('${linked_type}', this.value);">${trait_type_options}</select>
+               ${range_options}
+            </div>
+         </div>
+      </div>
+   `));
 
-   // Привязанный объект. data-show-subtext="true"
-   row.append($(`<td><select id="linked_object${linked_type}" name="linked_object${linked_type}" class="selectpicker" title="Выберите объект" data-live-search="true" data-width="250px" style="max-width: 250px;" onChange="linkedObjectChaged('${linked_type}', this.value);"><option data-content="" value=""></option></select></td>`));
+   card.append($(`<div class="yh-trait-card-body"><input type="hidden" class="form-control" name="trait_type" value="${linked_type}"></div>`));
+   let bodyCell = card.find('.yh-trait-card-body');
+   let mainRow = $('<div class="yh-trait-main-row"></div>');
+   bodyCell.append(mainRow);
+
+   // Привязанный объект.
+   let objectSelect = $(`<select id="linked_object${linked_type}" name="linked_object${linked_type}" class="selectpicker" title="Выберите объект" data-live-search="true" data-width="100%" onChange="linkedObjectChaged('${linked_type}', this.value);"><option data-content="" value=""></option></select>`);
+   let objectField = $('<div class="yh-trait-field"></div>').append('<div class="yh-trait-label">Объект</div>').append(objectSelect);
+   mainRow.append(objectField);
 
    renderObjectSelectbox('linked_object' + linked_type, linked_object);
 
    // Привязанное свойство.
-   row.append($(`<td><select id="linked_property${linked_type}" name="linked_property${linked_type}" class="selectpicker" title="Укажите свойство" data-width="250px" style="max-width: 250px;" onChange="linkedPropertyChaged('${linked_type}', this.value);"></select></td>`));
+   let propSelect = $(`<select id="linked_property${linked_type}" name="linked_property${linked_type}" class="selectpicker" title="Укажите свойство" data-width="100%" onChange="linkedPropertyChaged('${linked_type}', this.value);"></select>`);
+   let propField = $('<div class="yh-trait-field"></div>').append('<div class="yh-trait-label">Свойство</div>').append(propSelect);
+   mainRow.append(propField);
 
    renderPropertySelectbox('linked_property' + linked_type, linked_object, linked_property);
 
-   var reportable_color = (reportable) ? "color: green" : 'color: #959595;';
+   let mapPresetField = $('<div class="yh-trait-field yh-trait-map-field"></div>')
+      .append('<div class="yh-trait-label">Соответствия MJDM -> Yandex</div>')
+      .append($('<select id="value_map_preset_' + linked_type + '" class="selectpicker" data-width="100%" onchange="changeTraitValueMapPreset(\'' + linked_type + '\', this.value);">' + map_preset_options + '</select>'));
+   bodyCell.append('<div class="yh-trait-map-hint alert alert-info">В MJDM и Яндекс значения могут храниться по-разному, поэтому тут можно настроить соответствие значений.</div>');
+   bodyCell.append(mapPresetField);
+   let mapEditorField = $('<div class="yh-trait-field yh-trait-map-editor-field"><div id="value_map_editor_' + linked_type + '" class="yh-map-editor"></div></div>');
+   bodyCell.append(mapEditorField);
+
+   let reportable_btn_class = reportable ? 'btn-success' : 'btn-default';
+   let reportable_btn_text = reportable ? 'Репорт: Вкл' : 'Репорт: Выкл';
 
    let split_options = '';
    if (instance_list[linked_type].capability === 'on_off') {
 //console.log(split);
       if (typeof(instance_list[linked_type].parameters) != 'undefined' && instance_list[linked_type].parameters !== null) {
-         var split_color = (split) ? "color: green" : 'color: #959595;';
+         let split_btn_class = split ? 'btn-success' : 'btn-default';
+         let split_btn_text = split ? 'Split: Вкл' : 'Split: Выкл';
          split_options =
-         `<span title="Разделение кнопки на 2 отдельные Вкл/Выкл (доступно только при выключенном Reportable)" id="${linked_type}" class="btn btn-link splitBtn" onclick="addReportable($(this).attr(\'id\'),true);"><i class="glyphicon glyphicon-sound-stereo" style="${split_color}"></i></span>`;
+         `<button type="button" title="Разделение кнопки на 2 отдельные Вкл/Выкл (доступно только при выключенном Reportable)" id="${linked_type}" class="btn btn-xs ${split_btn_class} splitBtn" onclick="addReportable($(this).attr('id'),true);"><i class="glyphicon glyphicon-sound-stereo"></i>&nbsp;${split_btn_text}</button>`;
       }
    }
 
 
-   // Кнопка удаления метрики.
-   row.append($(`<td style="display: flex"><span id="${linked_type}" class="btn btn-link" onclick="deleteTrait($(this).attr(\'id\'));"><i class="glyphicon glyphicon-trash"></i></span>[#if SKILL_ACCESS_TOKEN != ''#]<span title="Система будет автоматически отправлять изменения в Яндекс. (Требуется настройка)" id="${linked_type}" class="btn btn-link reportableBtn" onclick="addReportable($(this).attr(\'id\'));"><i class="glyphicon glyphicon-retweet" style="${reportable_color}"></i></span>[#endif#]${split_options}</td>`));
+   // Действия карточки.
+   let actionsBlock = $(`<div class="yh-trait-actions"><div class="btn-group btn-group-xs" role="group"><button type="button" id="${linked_type}" class="btn btn-default" title="Удалить умение" onclick="deleteTrait($(this).attr('id'));"><i class="glyphicon glyphicon-trash"></i></button>[#if REPORTABLE_CONFIGURED="1"#]<button type="button" title="Система будет автоматически отправлять изменения в Яндекс. (Требуется настройка)" id="${linked_type}" class="btn ${reportable_btn_class} reportableBtn" onclick="addReportable($(this).attr('id'));"><i class="glyphicon glyphicon-retweet"></i></button>[#endif#]${split_options}</div></div>`);
+   mainRow.append(actionsBlock);
+
+   $('#trait_type_select_' + linked_type).selectpicker('render');
+   $('#trait_type_select_' + linked_type).selectpicker('refresh');
+   $('#value_map_preset_' + linked_type).selectpicker('render');
+   $('#value_map_preset_' + linked_type).selectpicker('refresh');
+   renderValueMapEditor(linked_type);
 }
 
 function addTrait() {
@@ -432,6 +686,13 @@ function addTrait() {
       traits_list[trait_type].linked_object = '';
       traits_list[trait_type].linked_property = '';
       traits_list[trait_type].reportable = false;
+      if (trait_type === 'on') {
+         traits_list[trait_type].value_map_preset = 'bool_onoff_10';
+         traits_list[trait_type].value_map = {'1':'on','0':'off','true':'on','false':'off'};
+      } else {
+         traits_list[trait_type].value_map_preset = 'none';
+         traits_list[trait_type].value_map = {};
+      }
       saveTraitsList();
 
       isPopover = false;
@@ -445,28 +706,19 @@ function addTrait() {
 
       // Сбрасываем значение список выбора метрик на дефолтное (пустое).
       $('#select_trait').selectpicker('val', '');
-      // Делаем неактивными пункты в списке выбора метрик.
-      $('#select_trait').find('[value=' + trait_type + ']').prop('disabled', true);
-      // Обновляем список выбора метрик.
-      $('#select_trait').selectpicker('refresh');
+      refreshTraitsSelectDisabled();
    }
 }
 
 function deleteTrait(trait_type) {
-   // Удаляем строки из таблицы метрик.
-   let rowTitle = document.getElementById('table_titlerow' + trait_type);
-   rowTitle.parentElement.removeChild(rowTitle);
-   let rowMain = document.getElementById('table_mainrow' + trait_type);
-   rowMain.parentElement.removeChild(rowMain);
+   // Удаляем карточку умения.
+   $('#trait_card_' + trait_type).remove();
 
    // Удаляем элемент из массива traits_list
    delete(traits_list[trait_type]);
    saveTraitsList();
 
-   // Делаем активными пункт в списке выбора метрик.
-   $('#select_trait').find('[value=' + trait_type + ']').prop('disabled', false);
-   // Обновляем список выбора метрик.
-   $('#select_trait').selectpicker('refresh');
+   refreshTraitsSelectDisabled();
 }
 
 function saveTraitsList() {
@@ -607,3 +859,149 @@ function escapeHtml(string) {
 }
 
 </script>
+
+<style>
+.yh-traits-list {
+   margin-top: 8px;
+}
+
+.yh-trait-card {
+   margin-bottom: 10px;
+}
+
+.yh-trait-card-head {
+   background: #f7f9fc;
+   border: 1px solid #dbe2ea;
+   border-bottom: 0;
+   border-radius: 6px 6px 0 0;
+}
+
+.yh-trait-card-body {
+   background: #ffffff;
+   border: 1px solid #dbe2ea;
+   border-top: 0;
+   border-radius: 0 0 6px 6px;
+   padding: 10px 12px !important;
+}
+
+.yh-trait-head-wrap {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   gap: 10px;
+   padding: 10px 12px;
+}
+
+.yh-trait-head-title {
+   font-weight: 600;
+   color: #22313f;
+}
+
+.yh-trait-head-controls {
+   display: flex;
+   align-items: center;
+   gap: 4px;
+}
+
+.yh-trait-type-select {
+   min-width: 220px;
+}
+
+.yh-trait-field {
+   min-width: 0;
+}
+
+.yh-trait-label {
+   color: #7c8795;
+   font-size: 11px;
+   margin-bottom: 4px;
+}
+
+.yh-trait-actions {
+   display: flex;
+   align-items: center;
+   justify-content: flex-end;
+   min-height: 34px;
+}
+
+.yh-trait-map-editor-field {
+   width: 100%;
+}
+
+.yh-trait-map-field {
+   width: 100%;
+}
+
+.yh-trait-main-row {
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+   gap: 10px;
+   align-items: end;
+}
+
+.yh-trait-main-row .bootstrap-select,
+.yh-trait-map-field .bootstrap-select {
+   width: 100% !important;
+   max-width: 100%;
+}
+
+.yh-trait-main-row .bootstrap-select > .dropdown-toggle,
+.yh-trait-map-field .bootstrap-select > .dropdown-toggle {
+   width: 100%;
+}
+
+.yh-trait-map-hint {
+   margin: 10px 0 8px 0;
+   padding: 6px 10px;
+   font-size: 12px;
+}
+
+.yh-map-editor {
+   border: 1px solid #e5e9ef;
+   border-radius: 6px;
+   padding: 8px;
+   background: #fafbfd;
+}
+
+.yh-map-header {
+   display: grid;
+   grid-template-columns: 1fr 1fr 36px;
+   gap: 8px;
+   font-size: 11px;
+   color: #7c8795;
+   margin-bottom: 6px;
+}
+
+.yh-map-row {
+   display: grid;
+   grid-template-columns: 1fr 1fr 36px;
+   gap: 8px;
+   margin-bottom: 6px;
+}
+
+.yh-map-add {
+   margin-top: 2px;
+}
+
+@media (max-width: 1200px) {
+   .yh-trait-main-row {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .yh-trait-actions {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+   }
+}
+
+@media (max-width: 768px) {
+   .yh-trait-main-row {
+      grid-template-columns: 1fr;
+   }
+
+   .yh-map-header,
+   .yh-map-row {
+      grid-template-columns: 1fr;
+   }
+}
+</style>

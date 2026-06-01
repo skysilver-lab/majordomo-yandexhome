@@ -17,7 +17,7 @@ if (!$server->validateAuthorizeRequest($request, $response)) {
    die;
 }
 
-$_SESSION['REQUEST_URI'] = $request->server['REQUEST_URI'];
+$_SESSION['REQUEST_URI'] = isset($request->server['REQUEST_URI']) ? $request->server['REQUEST_URI'] : '';
 
 $user_name = $yandexhome->config['USER_NAME'];
 $user_pass = $yandexhome->config['USER_PASS'];
@@ -99,7 +99,7 @@ if ($_SESSION['AUTH'] && isset($_POST['authorized'])) {
             <br>
             <button class="btn btn-link" type="submit" name="authorized" value="no"><b>Отказать</b></button>
          </form>
-         <h6>OAuth2 Client ID: <?php echo $request->query['client_id']; ?></h6>
+         <h6>OAuth2 Client ID: <?php echo isset($request->query['client_id']) ? $request->query['client_id'] : ''; ?></h6>
       </div>
    </main>
    

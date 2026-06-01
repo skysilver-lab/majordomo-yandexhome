@@ -30,14 +30,16 @@ if (!isset($request->server['PATH_INFO'])) {
       $content = $request->request;
 
       // Если действительно команда PING.
-      if ($content['request']['command'] == 'ping' || $content['request']['original_utterance'] == 'ping') {
+      $command = isset($content['request']['command']) ? $content['request']['command'] : '';
+      $utterance = isset($content['request']['original_utterance']) ? $content['request']['original_utterance'] : '';
+      if ($command == 'ping' || $utterance == 'ping') {
          // Отвечаем PONG (HTTP/1.1 200 OK).
          $response = json_encode([
             'version' => API_VERSION,
             'session' => [
-               'session_id' => $content['session']['session_id'],
-               'message_id' => $content['session']['message_id'],
-               'user_id'    => $content['session']['user_id']
+               'session_id' => isset($content['session']['session_id']) ? $content['session']['session_id'] : '',
+               'message_id' => isset($content['session']['message_id']) ? $content['session']['message_id'] : '',
+               'user_id'    => isset($content['session']['user_id']) ? $content['session']['user_id'] : ''
             ],
             'response' => [
                'text' => 'pong'
@@ -82,7 +84,7 @@ if (!isset($request->server['PATH_INFO'])) {
       // Если аутентификация успешна, то обрабатываем запрос.
 
       $content = $request->request;
-      $content['request_id'] = $request->headers['X_REQUEST_ID'];
+      $content['request_id'] = isset($request->headers['X_REQUEST_ID']) ? $request->headers['X_REQUEST_ID'] : '';
       $path = $request->server['PATH_INFO'];
       $response = '';
 
@@ -90,7 +92,7 @@ if (!isset($request->server['PATH_INFO'])) {
 
       // Если верные версия API и формат запроса.
       if (array_shift($api_query) == 'v'.API_VERSION && array_shift($api_query) == 'user') {
-         if ($api_query[0] == 'devices') {
+         if (isset($api_query[0]) && $api_query[0] == 'devices') {
             if (isset($api_query[1])) {
                if ($api_query[1] == 'query') {
                   // Обработка запроса информации о состоянии устройств.
@@ -103,7 +105,7 @@ if (!isset($request->server['PATH_INFO'])) {
                // Обработка запроса информации о перечне устройств.
                $response = $yandexhome->HandleSyncRequest($content);
             }
-         } else if ($api_query[0] == 'unlink') {
+         } else if (isset($api_query[0]) && $api_query[0] == 'unlink') {
             // Обработка запроса на разъединение аккаунтов.
             $response = $yandexhome->HandleUnlinkRequest($content);
          } else {

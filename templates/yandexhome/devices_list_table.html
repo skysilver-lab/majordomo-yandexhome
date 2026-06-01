@@ -22,7 +22,7 @@
    [#if TITLE#]
    <tr style="height:52px">
       <td style="vertical-align:middle;width:60px" class="text-center">
-         <img src="../templates/yandexhome/img/[#ICON#].svg" height="40px" onError="this.src='../img/modules/yandexhome.png'">
+         <img src="../templates/yandexhome/img/[#ICON_WEBP#].webp" height="40px" onError="this.onerror=null;this.src='../templates/yandexhome/img/[#ICON#].svg';this.onerror=function(){this.src='../img/modules/yandexhome.png';};">
       </td>
       <td style="vertical-align:middle">
          <b>[#TITLE#]</b>

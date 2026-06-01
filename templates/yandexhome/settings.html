@@ -42,19 +42,26 @@
             <span class="btn btn-link" onclick="generateClientKey();" title="Генерировать случайный"><i class="glyphicon glyphicon-refresh"></i></span>
          </div>
          <div class="form-group">
-            <label class="control-label">OAuth2 User Token
-               <span class='support-hover' tabindex="1" data-title="https://yandex.ru/dev/dialogs/smart-home/doc/reference-alerts/resources-alerts.html">
+            <label class="control-label">Токен уведомлений Яндекс
+               <span class='support-hover' tabindex="1" data-title="Токен Яндекс Диалогов для Notification service API. Используется только для reportable/callback.">
                   <i class="glyphicon glyphicon-info-sign"></i>
                </span>
             </label>
             <div class="col-lg-8">
                <input class="form-control" type="text" name="skill_access_token" id="skill_access_token" value="[#if SKILL_ACCESS_TOKEN!=""#][#SKILL_ACCESS_TOKEN#][#endif#]" class="input">
-			   
-			   <div class="alert alert-warning" style="margin-top: 10px; margin-bottom: 0px">
-					Необязателен! Требуется для активации дополнительного функционала, такого как: участие датчиков в сценариях Яндекс, автоматическая запись и хранение истории датчика на сервере Яндекс. Для получения токена перейдите <a href="https://yandex.ru/dev/dialogs/smart-home/doc/reference-alerts/resources-alerts.html#resources-alerts__oauth" target="_blank">сюда</a> под той учетной записью, под которой создан навык и нажмите на ссылку <b>OAuth-токен для Диалогов</b> - на экране появится токен. После этого сделайте свой навык ПУБЛИЧНЫМ, сохраните, но не отправляйте на модерацию!
-					<br>
-					Так же, <b>OAuth2 KEY навыка</b> должен совпадать с <a href="https://dialogs.yandex.ru/developer" target="_blank"><b>Идентификатор диалога</b></a>, если нет - измените его вручную!
-				</div>
+            </div>
+         </div>
+         <div class="form-group">
+            <label class="control-label">ID навыка/диалога
+               <span class='support-hover' tabindex="1" data-title="Идентификатор навыка в Яндекс Диалогах. Используется в URL /api/v1/skills/{skill_id}/callback/state для reportable.">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+               </span>
+            </label>
+            <div class="col-lg-8">
+               <input class="form-control" type="text" name="skill_id" id="skill_id" value="[#if SKILL_ID!=""#][#SKILL_ID#][#endif#]" class="input">
+               <div class="alert alert-warning" style="margin-top: 10px; margin-bottom: 0px">
+                  Эти поля необязательны и нужны только для reportable/callback: автоматической отправки изменений устройств в Яндекс без запроса от Алисы. По текущей публичной документации Яндекса callback отправляется на <code>dialogs.yandex.net</code> с заголовком <code>Authorization: OAuth &lt;token&gt;</code>. Если токен или ID навыка не указаны, модуль отдаст <code>reportable=false</code> и не будет отправлять callback.
+               </div>
             </div>
          </div>
          <div class="form-group">
@@ -113,6 +120,7 @@
                <tr><td>ID пользователя:</td><td><code>[#USER_ID#]</code></td></tr>
                <tr><td>OAuth2 ID:</td><td><code>[#CLIENT_ID#]</code></td></tr>
                <tr><td>OAuth2 KEY:</td><td><code>[#CLIENT_KEY#]</code></td></tr>
+               <tr><td>ID навыка/диалога:</td><td><code>[#SKILL_ID#]</code></td></tr>
                <tr><td>OAuth2 Access token:</td><td><code>[#ACCESS_TOKEN#]</code></td></tr>
                <tr><td>OAuth2 Access token expires:</td><td><code>[#ACCESS_TOKEN_EXPIRES#]</code></td></tr>
                <tr><td>OAuth2 Refresh token:</td><td><code>[#REFRESH_TOKEN#]</code></td></tr>

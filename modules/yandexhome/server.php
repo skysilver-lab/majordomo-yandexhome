@@ -6,7 +6,8 @@ include_once ('./config.php');
 include_once ('./lib/loader.php');
 include_once ('./load_settings.php');
 
-$timezone = SQLSelectOne('SELECT NAME, VALUE FROM settings WHERE NAME="SITE_TIMEZONE"')['VALUE'];
+$timezone_row = SQLSelectOne('SELECT NAME, VALUE FROM settings WHERE NAME="SITE_TIMEZONE"');
+$timezone = is_array($timezone_row) && isset($timezone_row['VALUE']) ? $timezone_row['VALUE'] : null;
 
 if ($timezone != null && $timezone != '') {
    date_default_timezone_set ($timezone);
